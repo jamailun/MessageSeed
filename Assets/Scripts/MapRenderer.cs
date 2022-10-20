@@ -1,55 +1,38 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class MapRenderer : MonoBehaviour {
 
-    public enum UrlFecther {
-        GoogleApi,
-        OpenStreetTiles,
-        GeoApiFy,
-    }
+    private SpriteRenderer spriteRenderer;
 
-    [SerializeField] private SpriteRenderer spriteRenderer;
-
-    [Header("Config")]
-
-    [SerializeField] private UrlFecther provider;
-    [SerializeField] private string providerToken;
-    [SerializeField] private int zoom = 10;
-    [SerializeField] private Vector2Int size;
-    [SerializeField] private Vector2 position = new(48.8485295f, 2.2609919f);
-
-    private UrlFetcher urlProvider;
+    public float width, height;
 
     private void Start() {
         if(!spriteRenderer)
             spriteRenderer = GetComponent<SpriteRenderer>();
         if(!spriteRenderer)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if(!spriteRenderer)
             Debug.LogError("Could not find any sprite renderer for MapRenderer " + name + ".");
-
-        ReloadProvider();
-
-        UpdateMap();
     }
 
-    public void ReloadProvider() {
-        urlProvider = provider switch {
-            UrlFecther.GoogleApi => new GoogleMapUrlFetcher(providerToken, (uint) size.x, (uint) size.y),
-            UrlFecther.OpenStreetTiles => new OpenStreetMapURL(),
-            UrlFecther.GeoApiFy => new GeoApiFyUrlFetcher(providerToken),
-            _ => throw new System.Exception("Unknown provider : " + provider + ".")
-        };
+	public void Init(float width, float height) {
+        this.width = width;
+        this.height = height;
+        if(!spriteRenderer)
+            Start();
     }
 
-    private IEnumerator LoadSprite() {
-        //WWW www = new WWW(exampleUrl + key + apiKey);
-        WWW www = new WWW(urlProvider.CreateUrl(position, zoom));
+	private IEnumerator LoadSprite(string url) {
+        WWW www = new(url);
         yield return www;
-        Debug.Log("Image successfully fetched.");
-        spriteRenderer.sprite = Sprite.Create(www.texture, new Rect(0, 0, size.x, size.y), new Vector2());
+        Debug.Log("Image successfully fetched from ["+url+"].");
+        spriteRenderer.sprite = Sprite.Create(www.texture, new Rect(0, 0, width, height), new Vector2());
     }
 
-    public void UpdateMap() {
-        StartCoroutine(LoadSprite());
+    public void UpdateMap(UrlFetcher fetcher, int x, int y, int zoom) {
+        string url = fetcher.CreateUrlTile(x, y, zoom);
+        StartCoroutine(LoadSprite(url));
     }
 }
