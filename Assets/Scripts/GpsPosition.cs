@@ -108,7 +108,7 @@ public class GpsPosition : MonoBehaviour {
             yield return new WaitForSeconds(updatePositionAfter);
             LastPosition = new(Input.location.lastData.latitude, Input.location.lastData.longitude);
             LastUpdate = Input.location.lastData.timestamp;
-            Debug.Log("Position = "+LastPosition+" at " + LastUpdate+".");
+            //Debug.Log("Position = "+LastPosition+" at " + LastUpdate+".");
         }
 
         LocationReady = false;

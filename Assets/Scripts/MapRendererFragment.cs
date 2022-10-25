@@ -34,7 +34,7 @@ public class MapRendererFragment : MonoBehaviour {
         } else {
             Debug.Log("Image successfully fetched from [" + url + "].");
             Texture2D texture = ((DownloadHandlerTexture) www.downloadHandler).texture;
-            spriteRenderer.sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2());
+            spriteRenderer.sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(.5f, .5f));
         }
     }
 

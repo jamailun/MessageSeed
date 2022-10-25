@@ -25,7 +25,11 @@ public class MapRendererGrid : MonoBehaviour {
     private void Start() {
         ReloadUrlFetcher();
         UpdateChildren();
-        UpdateMap();
+    }
+
+    public void SetPosition(Vector2 position) {
+        latitude  = position.x;
+        longitude = position.y;
     }
 
     public void ReloadUrlFetcher() {
