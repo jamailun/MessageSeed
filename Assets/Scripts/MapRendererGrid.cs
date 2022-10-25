@@ -26,6 +26,7 @@ public class MapRendererGrid : MonoBehaviour {
 
     private void Start() {
         ReloadUrlFetcher();
+        UpdateChildren();
         UpdateMap();
     }
 
