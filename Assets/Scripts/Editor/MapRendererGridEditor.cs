@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(MapRendererGrid))]
@@ -26,3 +27,4 @@ public class MapRendererGridEditor : Editor {
 		}
 	}
 }
+#endif

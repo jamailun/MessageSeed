@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Android;
 
 public class GpsPosition : MonoBehaviour {
 
@@ -24,16 +25,52 @@ public class GpsPosition : MonoBehaviour {
 	}
 
 	private void Start() {
+        AskLocationPermission();
+    }
+
+
+    private void AskLocationPermission() {
+        Debug.Log("Check if user has permission [" + Permission.FineLocation + "]");
+        if(Permission.HasUserAuthorizedPermission(Permission.FineLocation)) {
+            Debug.Log("Permission already enabled.");
+            // Start loop
+            StartLocation();
+            return;
+        }
+        Debug.Log("Permission already enabled.");
+
+        // No permission. We ask for it.
+
+        var cb = new PermissionCallbacks();
+        cb.PermissionDenied += (s) => {
+            Debug.LogErrorFormat("User denied permission: {0}", s);
+        };
+        cb.PermissionDeniedAndDontAskAgain += (s) => {
+            Debug.LogErrorFormat("User Denied permission, dont ask again: {0}", s);
+        };
+        cb.PermissionGranted += (s) => {
+            Debug.LogFormat("User granted permission: {0}. Now we start location.", s);
+            StartLocation();
+        };
+
+        Debug.Log("Send permission Request.");
+        Permission.RequestUserPermission(Permission.FineLocation, cb);
+    }
+
+    // Method called after #AskLocationPermission
+    private void StartLocation() {
+        Debug.Log("Start location.");
+
         HasLocationEnabled = Input.location.isEnabledByUser;
         if(!HasLocationEnabled) {
             Debug.LogError("Cannot access localisation data.");
             return;
-		}
+        }
         LocationReady = false;
         StartCoroutine(GetPositionLoop());
     }
 
-	private void OnDisable() {
+    private void OnDisable() {
         // Shutdown location on disabling
         if(LocationReady) {
             Input.location.Stop();

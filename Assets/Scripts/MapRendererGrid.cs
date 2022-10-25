@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 public class MapRendererGrid : MonoBehaviour {
@@ -22,7 +20,7 @@ public class MapRendererGrid : MonoBehaviour {
 
     // fields
     private UrlFetcher fetcher;
-    private MapRenderer[,] renderers;
+    private MapRendererFragment[,] renderers;
 
     private void Start() {
         ReloadUrlFetcher();
@@ -43,17 +41,17 @@ public class MapRendererGrid : MonoBehaviour {
         // Remove immediate all children
         var tempList = transform.Cast<Transform>().ToList();
         foreach(var child in tempList) {
-            if(child.gameObject.GetComponent<MapRenderer>() != null)
+            if(child.gameObject.GetComponent<MapRendererFragment>() != null)
                 DestroyImmediate(child.gameObject);
         }
         float dx = fragmentSize.x / 100f;
         float dy = fragmentSize.y / 100f;
         // Add new children
-        renderers = new MapRenderer[amountX, amountY];
+        renderers = new MapRendererFragment[amountX, amountY];
         for(int i = 0; i < amountX; i++) {
             for(int j = 0; j < amountY; j++) {
                 GameObject go = new("map_" + i + "_" + j);
-                var mapPart = go.GetOrAddComponent<MapRenderer>();
+                var mapPart = go.GetOrAddComponent<MapRendererFragment>();
                 mapPart.Init(fragmentSize.x, fragmentSize.y);
                 go.transform.SetParent(transform);
                 go.transform.localPosition = new(i * dx, j * dy, 0);
