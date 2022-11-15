@@ -22,6 +22,7 @@ public class MapRendererGrid : MonoBehaviour {
     private UrlFetcher _fetcher;
     private MapRendererFragment[,] _renderers;
     private Vector3 _unityPosition;
+    public Bounds CurrentBounds { get; private set; }
 
     private void Start() {
         ReloadUrlFetcher();
@@ -37,6 +38,9 @@ public class MapRendererGrid : MonoBehaviour {
 	private void OnDrawGizmos() {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(_unityPosition - transform.position, 0.1f);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(transform.position, 0.15f);
+        Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
 	}
 
 	public void ReloadUrlFetcher() {
@@ -57,6 +61,14 @@ public class MapRendererGrid : MonoBehaviour {
         }
         float dx = _fragmentSize.x / 100f;
         float dy = _fragmentSize.y / 100f;
+
+        CurrentBounds = new Bounds(
+            // center
+            transform.position,
+            // size
+            new Vector3()
+        );
+
         // Add new children
         _renderers = new MapRendererFragment[_amountX, _amountY];
         for(int i = 0; i < _amountX; i++) {
@@ -68,8 +80,15 @@ public class MapRendererGrid : MonoBehaviour {
                 go.transform.localPosition = new(i * dx, j * dy, 0);
                 go.GetOrAddComponent<SpriteRenderer>().sprite = _defaultSprite;
                 _renderers[i, j] = mapPart;
+
+                CurrentBounds = CurrentBounds.Expand(mapPart.Bounds);
+                //CurrentBounds.Encapsulate(mapPart.Bounds.min);
+                //CurrentBounds.Encapsulate(mapPart.Bounds.max);
             }
         }
+        Debug.Log("0,0 => "+ _renderers[0,0].Bounds);
+        Debug.Log(CurrentBounds);
+
     }
 
     public void UpdateMap() {

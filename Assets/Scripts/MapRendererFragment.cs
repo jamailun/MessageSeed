@@ -7,6 +7,7 @@ public class MapRendererFragment : MonoBehaviour {
 
     private SpriteRenderer _spriteRenderer;
     private float _width, _height;
+    public Bounds Bounds => _spriteRenderer.bounds;
 
     private void Start() {
         if(!_spriteRenderer)
@@ -22,6 +23,14 @@ public class MapRendererFragment : MonoBehaviour {
         this._height = height;
         if(!_spriteRenderer)
             Start();
+    }
+
+	private void OnDrawGizmos() {
+        Gizmos.color = Color.magenta;
+        var r = GetComponent<SpriteRenderer>();
+        //Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
+        Gizmos.DrawSphere(r.bounds.min, 0.05f);
+        Gizmos.DrawSphere(r.bounds.max, 0.05f);
     }
 
 	private IEnumerator LoadSprite(string url, int x, int y, int zoom) {
