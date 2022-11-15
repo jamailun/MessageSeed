@@ -430,6 +430,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundZ: 0
+  zoomOutMin: 1
+  zoomOutMax: 8
+  zoomSensitivity: 0.01
 --- !u!1 &527601744
 GameObject:
   m_ObjectHideFlags: 0
@@ -926,7 +929,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &759834749
 RectTransform:
   m_ObjectHideFlags: 0
