@@ -21,12 +21,16 @@ public class MapRendererGrid : MonoBehaviour {
 
     // fields
     private UrlFetcher _fetcher;
-    //private MapRendererFragment[,] _renderers;
     private readonly List<MapRendererFragment> _renderers = new();
     private Vector3 _unityPosition;
     public Bounds CurrentBounds { get; private set; }
 
+    private float _fragDx, _fragDy;
+
     private void Start() {
+        _fragDx = _fragmentSize.x / 100f;
+        _fragDy = _fragmentSize.y / 100f;
+
         ReloadUrlFetcher();
         UpdateChildren();
     }
@@ -38,11 +42,17 @@ public class MapRendererGrid : MonoBehaviour {
     }
 
 	private void OnDrawGizmos() {
+        //positions
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(_unityPosition - transform.position, 0.1f);
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(transform.position, 0.15f);
+        // current bounds
         Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
+        // index bounds
+        Gizmos.color = Color.white;
+        var ib = new Vector3(_fragDx * (indexMax.x - indexMin.x), _fragDy * (indexMax.y - indexMin.y));
+        Gizmos.DrawWireCube(ib / 2f, ib);
 	}
 
 	public void ReloadUrlFetcher() {
@@ -61,34 +71,64 @@ public class MapRendererGrid : MonoBehaviour {
             if(child.gameObject.GetComponent<MapRendererFragment>() != null)
                 DestroyImmediate(child.gameObject);
         }
-        float dx = _fragmentSize.x / 100f;
-        float dy = _fragmentSize.y / 100f;
-
-        CurrentBounds = new Bounds(
-            // center
-            transform.position,
-            // size
-            new Vector3()
-        );
 
         // Add new children
-        //_renderers = new MapRendererFragment[_amountX, _amountY];
         for(int i = 0; i < _amountX; i++) {
             for(int j = 0; j < _amountY; j++) {
-                GameObject go = new("map_" + i + "_" + j);
-                var mapPart = go.GetOrAddComponent<MapRendererFragment>();
-                mapPart.Init(_fragmentSize.x, _fragmentSize.y, i, j);
-                go.transform.SetParent(transform);
-                go.transform.localPosition = new(i * dx, j * dy, 0);
-                go.GetOrAddComponent<SpriteRenderer>().sprite = _defaultSprite;
-                //_renderers[i, j] = mapPart;
-                _renderers.Add(mapPart);
-
-                CurrentBounds = CurrentBounds.Expand(mapPart.Bounds);
+                CreateMapElement(i, j);
             }
         }
-        Debug.Log("current bounds = " + CurrentBounds);
 
+        // Recalculate bounds
+        RecalculateBounds();
+        Debug.Log("current bounds = " + CurrentBounds);
+    }
+
+    private Vector2Int indexMin, indexMax;
+    // Recalculate bounds after children updates
+    private List<MapRendererFragment> RecalculateBounds() {
+        indexMin = new(int.MaxValue, int.MaxValue);
+        indexMax = new(int.MinValue, int.MinValue);
+        var visible = _renderers.Find(mr => mr.gameObject.activeInHierarchy);
+        // Reset the bounds
+        CurrentBounds = new Bounds(
+            // center
+            visible == null ? transform.position : visible.Bounds.center,
+             // size
+             new Vector3()
+        );
+        List<MapRendererFragment> visibleFragments = new();
+        // Expand with all visibles trucs
+        foreach(var mr in _renderers) {
+            if(mr.gameObject.activeInHierarchy) {
+                // expand the bound
+                CurrentBounds = CurrentBounds.Expand(mr.Bounds);
+                // try to expand the indexes
+                if(mr.IndexI < indexMin.x)
+                    indexMin.x = mr.IndexI;
+                if(mr.IndexJ < indexMin.y)
+                    indexMin.y = mr.IndexJ;
+                if(mr.IndexI > indexMax.x)
+                    indexMax.x = mr.IndexI;
+                if(mr.IndexJ > indexMax.y)
+                    indexMax.y = mr.IndexJ;
+                // Add the fragment to he visible list
+            }
+        }
+
+        Debug.Log("indexes. m=(" + indexMin + "), M=(" + indexMax + ")");
+
+        return visibleFragments;
+    }
+
+    private void CreateMapElement(int i, int j) {
+        GameObject go = new("map_" + i + "_" + j);
+        var mapPart = go.GetOrAddComponent<MapRendererFragment>();
+        mapPart.Init(_fragmentSize.x, _fragmentSize.y, i, j);
+        go.transform.SetParent(transform);
+        go.transform.localPosition = new(i * _fragDx, j * _fragDy, 0);
+        go.GetOrAddComponent<SpriteRenderer>().sprite = _defaultSprite;
+        _renderers.Add(mapPart);
     }
 
     public void UpdateMap() {
@@ -99,15 +139,59 @@ public class MapRendererGrid : MonoBehaviour {
     }
 
     public void UpdateGridVisibility(Bounds camera) {
-        // Cacher les tiles qui ne sont lus nécessaires
+        // Hide non-visible tiles.
         foreach(var mr in _renderers) {
-            if(!mr.Bounds.Intersects2D(camera)) {
-                mr.gameObject.SetActive(false);
-            } else {
-                mr.gameObject.SetActive(true);
+            mr.gameObject.SetActive(mr.Bounds.Intersects2D(camera));
+        }
+
+        // Recalculate with hidden elements
+        var visibles = RecalculateBounds();
+
+        // Create missing tiles
+        // For each direction (left, right, up, down) we add a row/column if the camera overflows from the bounds
+
+        // LEFT : add a column on the left
+        if(camera.min.x < CurrentBounds.min.x) {
+            visibles = AddMapElementsColumn(indexMin.x - 1, indexMin.y, indexMax.y);
+        }
+
+        // RIGHT : add a column on the right
+        if(camera.max.x > CurrentBounds.max.x) {
+            visibles = AddMapElementsColumn(indexMax.x + 1, indexMin.y, indexMax.y);
+        }
+
+        // BOTTOM : add a column at the bottom
+        if(camera.min.y < CurrentBounds.min.y) {
+            visibles = AddMapElementsRow(indexMin.y - 1, indexMin.x, indexMax.x);
+        }
+
+        // TOP : add a column on the top
+        if(camera.max.y > CurrentBounds.max.y) {
+            visibles = AddMapElementsRow(indexMax.y + 1, indexMin.x, indexMax.x);
+        }
+
+        // check if no fragment is missing INSIDE the indexes
+        for(int i = indexMin.x; i <= indexMax.x; i++) {
+            for(int j = indexMin.y; j <= indexMax.y; j++) {
+                var mr = visibles.Find(r => r.IndexI == i && r.IndexJ == j);
+                if(mr == null) {
+                    CreateMapElement(i, j);
+                }
             }
         }
-        // créer les tiles manquantes.
 
+    }
+
+    private List<MapRendererFragment> AddMapElementsColumn(int x, int yMin, int yMax) {
+        for(int y = yMin; y <= yMax; y++) {
+            CreateMapElement(x, y);
+        }
+        return RecalculateBounds();
+    }
+    private List<MapRendererFragment> AddMapElementsRow(int y, int xMin, int xMax) {
+        for(int x = xMin; x <= xMax; x++) {
+            CreateMapElement(x, y);
+        }
+        return RecalculateBounds();
     }
 }
