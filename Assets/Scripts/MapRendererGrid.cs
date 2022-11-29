@@ -21,7 +21,21 @@ public class MapRendererGrid : MonoBehaviour {
 
     // fields
     private UrlFetcher _fetcher;
-    private readonly List<MapRendererFragment> _renderers = new();
+    private readonly Dictionary<int, FragmentsLayer> _renderersMap = new();
+    private List<MapRendererFragment> RenderersLayer {
+        get {
+            GarantyLayerExists();
+            return _renderersMap[_zoom].list;
+        }
+    }
+    private Transform RenderersLayerContainer {
+        get {
+            GarantyLayerExists();
+            return _renderersMap[_zoom].container;
+        }
+    }
+
+
     private Vector3 _unityPosition;
     public Bounds CurrentBounds { get; private set; }
 
@@ -89,7 +103,7 @@ public class MapRendererGrid : MonoBehaviour {
     private List<MapRendererFragment> RecalculateBounds() {
         indexMin = new(int.MaxValue, int.MaxValue);
         indexMax = new(int.MinValue, int.MinValue);
-        var visible = _renderers.Find(mr => mr.gameObject.activeInHierarchy);
+        var visible = RenderersLayer.Find(mr => mr.gameObject.activeInHierarchy);
         // Reset the bounds
         CurrentBounds = new Bounds(
             // center
@@ -99,7 +113,7 @@ public class MapRendererGrid : MonoBehaviour {
         );
         List<MapRendererFragment> visibleFragments = new();
         // Expand with all visibles trucs
-        foreach(var mr in _renderers) {
+        foreach(var mr in RenderersLayer) {
             if(mr.gameObject.activeInHierarchy) {
                 // expand the bound
                 CurrentBounds = CurrentBounds.Expand(mr.Bounds);
@@ -115,9 +129,7 @@ public class MapRendererGrid : MonoBehaviour {
                 // Add the fragment to he visible list
             }
         }
-
-        Debug.Log("indexes. m=(" + indexMin + "), M=(" + indexMax + ")");
-
+        // Return all visible tiles
         return visibleFragments;
     }
 
@@ -125,22 +137,22 @@ public class MapRendererGrid : MonoBehaviour {
         GameObject go = new("map_" + i + "_" + j);
         var mapPart = go.GetOrAddComponent<MapRendererFragment>();
         mapPart.Init(_fragmentSize.x, _fragmentSize.y, i, j);
-        go.transform.SetParent(transform);
+        go.transform.SetParent(RenderersLayerContainer);
         go.transform.localPosition = new(i * _fragDx, j * _fragDy, 0);
         go.GetOrAddComponent<SpriteRenderer>().sprite = _defaultSprite;
-        _renderers.Add(mapPart);
+        RenderersLayer.Add(mapPart);
     }
 
     public void UpdateMap() {
         Vector2Int center = MapUtils.GetTile(_latitude, _longitude, _zoom);
-        foreach(var mr in _renderers) {
+        foreach(var mr in RenderersLayer) {
             mr.UpdateMap(_fetcher, center.x + mr.IndexI - 1, center.y - mr.IndexJ + 1, _zoom);
 		}
     }
 
     public void UpdateGridVisibility(Bounds camera) {
         // Hide non-visible tiles.
-        foreach(var mr in _renderers) {
+        foreach(var mr in RenderersLayer) {
             mr.gameObject.SetActive(mr.Bounds.Intersects2D(camera));
         }
 
@@ -193,5 +205,19 @@ public class MapRendererGrid : MonoBehaviour {
             CreateMapElement(x, y);
         }
         return RecalculateBounds();
+    }
+    private class FragmentsLayer {
+        public readonly List<MapRendererFragment> list = new();
+        public readonly Transform container;
+        public FragmentsLayer(Transform container) {
+            this.container = container;
+        }
+    }
+    private void GarantyLayerExists() {
+        if(!_renderersMap.ContainsKey(_zoom)) {
+            var obj = new GameObject("layer_" + _zoom);
+            obj.transform.SetParent(transform);
+            _renderersMap[_zoom] = new(obj.transform);
+        }
     }
 }
