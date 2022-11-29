@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MapRendererGrid : MonoBehaviour {
@@ -20,7 +21,8 @@ public class MapRendererGrid : MonoBehaviour {
 
     // fields
     private UrlFetcher _fetcher;
-    private MapRendererFragment[,] _renderers;
+    //private MapRendererFragment[,] _renderers;
+    private readonly List<MapRendererFragment> _renderers = new();
     private Vector3 _unityPosition;
     public Bounds CurrentBounds { get; private set; }
 
@@ -70,33 +72,42 @@ public class MapRendererGrid : MonoBehaviour {
         );
 
         // Add new children
-        _renderers = new MapRendererFragment[_amountX, _amountY];
+        //_renderers = new MapRendererFragment[_amountX, _amountY];
         for(int i = 0; i < _amountX; i++) {
             for(int j = 0; j < _amountY; j++) {
                 GameObject go = new("map_" + i + "_" + j);
                 var mapPart = go.GetOrAddComponent<MapRendererFragment>();
-                mapPart.Init(_fragmentSize.x, _fragmentSize.y);
+                mapPart.Init(_fragmentSize.x, _fragmentSize.y, i, j);
                 go.transform.SetParent(transform);
                 go.transform.localPosition = new(i * dx, j * dy, 0);
                 go.GetOrAddComponent<SpriteRenderer>().sprite = _defaultSprite;
-                _renderers[i, j] = mapPart;
+                //_renderers[i, j] = mapPart;
+                _renderers.Add(mapPart);
 
                 CurrentBounds = CurrentBounds.Expand(mapPart.Bounds);
-                //CurrentBounds.Encapsulate(mapPart.Bounds.min);
-                //CurrentBounds.Encapsulate(mapPart.Bounds.max);
             }
         }
-        Debug.Log("0,0 => "+ _renderers[0,0].Bounds);
-        Debug.Log(CurrentBounds);
+        Debug.Log("current bounds = " + CurrentBounds);
 
     }
 
     public void UpdateMap() {
         Vector2Int center = MapUtils.GetTile(_latitude, _longitude, _zoom);
-        for(int i = 0; i < _amountX; i++) {
-            for(int j = 0; j < _amountY; j++) {
-                _renderers[i, j].UpdateMap(_fetcher, center.x + i - 1, center.y - j + 1, _zoom);
+        foreach(var mr in _renderers) {
+            mr.UpdateMap(_fetcher, center.x + mr.IndexI - 1, center.y - mr.IndexJ + 1, _zoom);
+		}
+    }
+
+    public void UpdateGridVisibility(Bounds camera) {
+        // Cacher les tiles qui ne sont lus nécessaires
+        foreach(var mr in _renderers) {
+            if(!mr.Bounds.Intersects2D(camera)) {
+                mr.gameObject.SetActive(false);
+            } else {
+                mr.gameObject.SetActive(true);
             }
         }
+        // créer les tiles manquantes.
+
     }
 }

@@ -7,6 +7,9 @@ public class MapRendererFragment : MonoBehaviour {
 
     private SpriteRenderer _spriteRenderer;
     private float _width, _height;
+    private int _i, _j;
+    public int IndexI => _i;
+    public int IndexJ => _j;
     public Bounds Bounds => _spriteRenderer.bounds;
 
     private void Start() {
@@ -18,9 +21,11 @@ public class MapRendererFragment : MonoBehaviour {
             Debug.LogError("Could not find any sprite renderer for MapRenderer " + name + ".");
     }
 
-	public void Init(float width, float height) {
+	public void Init(float width, float height, int i, int j) {
         this._width = width;
         this._height = height;
+        this._i = i;
+        this._j = j;
         if(!_spriteRenderer)
             Start();
     }
@@ -28,7 +33,7 @@ public class MapRendererFragment : MonoBehaviour {
 	private void OnDrawGizmos() {
         Gizmos.color = Color.magenta;
         var r = GetComponent<SpriteRenderer>();
-        //Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
+        Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
         Gizmos.DrawSphere(r.bounds.min, 0.05f);
         Gizmos.DrawSphere(r.bounds.max, 0.05f);
     }

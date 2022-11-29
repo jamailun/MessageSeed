@@ -55,9 +55,15 @@ public static class CSharpExtenstion {
 		return new(center, size);
 	}
 
-	public static bool Overlaps2D(this Bounds that, Bounds bounds) {
+	public static bool Contains2D(this Bounds that, Bounds bounds) {
 		return that.min.x <= bounds.min.x && that.max.x >= bounds.max.x
 			&& that.min.y <= bounds.min.y && that.max.y >= bounds.max.y;
+	}
+
+	public static bool Intersects2D(this Bounds that, Bounds bounds) {
+		bool notIntersectX = that.max.x < bounds.min.x || that.min.x > bounds.max.x;
+		bool notIntersectY = that.max.y < bounds.min.y || that.min.y > bounds.max.y;
+		return !(notIntersectX || notIntersectY);
 	}
 
 }	

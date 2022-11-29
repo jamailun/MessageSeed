@@ -30,19 +30,23 @@ public class MapUpdater : MonoBehaviour {
 	}
 
 	private void UserMoved() {
+		// pour l'instant, on vérifie que l'utilisateur ait toujours tout en face.
+		PostModification();
+	}
+
+	private void UserZoomed(float z) {
+		// pour l'instant, on vérifie que l'utilisateur ait toujours tout en face.
+		PostModification();
+	}
+
+	private void PostModification() {
 		// check si la caméra est contenu dans la grid existante
 		Bounds camera = _perspectiveController.CameraBounds;
 		Bounds grid = _mapRenderer.CurrentBounds;
-		if(grid.Overlaps2D(camera)) {
-			Debug.Log("comaera complitely inside grid.");
+		if(! grid.Contains2D(camera)) {
+			//Debug.Log("camera NOT completely inside grid.");
+			_mapRenderer.UpdateGridVisibility(camera);
 		}
-		// si oui, ba on change rien : le mouvement est mineur
-
-		// si non, il faut charger de nouvelles tiles.
-	}
-
-	private void UserZoomed(float v) {
-		
 	}
 
 }
