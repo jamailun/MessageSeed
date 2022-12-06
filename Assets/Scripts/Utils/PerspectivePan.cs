@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 
 public class PerspectivePan : MonoBehaviour {
+
     [SerializeField] private float groundZ = 0;
     [SerializeField] private float zoomOutMin = 1;
     [SerializeField] private float zoomOutMax = 8;
     [SerializeField] private float zoomSensitivity = 0.01f;
+    [SerializeField] [Range(1f, 4f)] private float cameraBoundsBuffer = 1.5f;
 
     public OnMoveEvent moveEvent;
     public OnZoomEvent zoomEvent;
@@ -18,9 +20,12 @@ public class PerspectivePan : MonoBehaviour {
 
 	private void OnDrawGizmos() {
         Gizmos.color = Color.green;
-        var b = CameraBounds;
+        var b = RawCameraBounds;
         Gizmos.DrawWireCube(b.center, b.size);
-	}
+        Gizmos.color = Color.black;
+        b = CameraBounds;
+        Gizmos.DrawWireCube(b.center, b.size);
+    }
 
 	void Update() {
         if(Input.GetMouseButtonDown(0)) {
@@ -48,11 +53,15 @@ public class PerspectivePan : MonoBehaviour {
             moveEvent?.Invoke();
         }
 
+#if UNITY_EDITOR
         if(Input.GetKey(KeyCode.KeypadPlus)) {
+            Debug.Log("zoom +");
             Zoom(zoomSensitivity, true);
         } else if(Input.GetKey(KeyCode.KeypadMinus)) {
+            Debug.Log("zoom -");
             Zoom(-zoomSensitivity, true);
         }
+#endif
     }
 
     private Vector3 GetWorldPosition(float z) {
@@ -73,7 +82,9 @@ public class PerspectivePan : MonoBehaviour {
         return orthoSize;
     }
 
-    public Bounds CameraBounds => Camera.main.OrthographicBounds();
+    public Bounds CameraBounds => new(RawCameraBounds.center, RawCameraBounds.size * cameraBoundsBuffer);
+
+    public Bounds RawCameraBounds => Camera.main.OrthographicBounds();
 
     public delegate void OnMoveEvent();
     public delegate void OnZoomEvent(float zoom);

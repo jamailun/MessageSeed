@@ -35,6 +35,8 @@ public class MapUpdater : MonoBehaviour {
 	}
 
 	private void UserZoomed(float z) {
+		// nouvelle valeur du zoom en int ??
+		Debug.Log("new zoom = " + z);
 		// pour l'instant, on vérifie que l'utilisateur ait toujours tout en face.
 		PostModification();
 	}

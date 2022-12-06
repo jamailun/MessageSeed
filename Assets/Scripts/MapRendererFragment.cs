@@ -54,7 +54,12 @@ public class MapRendererFragment : MonoBehaviour {
         }
     }
 
+    private bool hasImage = false;
+    private int lastX, lastY, lastZoom;
+
     public void UpdateMap(UrlFetcher fetcher, int x, int y, int zoom) {
+        if(hasImage && lastX == x && lastY == y && lastZoom == zoom)
+            return;
 
         TextureQuery res = TilesBuffer.Instance.TryGet(zoom, x, y);
         if(res.found) {
@@ -63,5 +68,9 @@ public class MapRendererFragment : MonoBehaviour {
             string url = fetcher.CreateUrlTile(x, y, zoom);
             StartCoroutine(LoadSprite(url, x, y, zoom));
         }
+        hasImage = true;
+        lastX = x;
+        lastY = y;
+        lastZoom = zoom;
     }
 }

@@ -19,8 +19,9 @@ public class MapRendererGrid : MonoBehaviour {
     [SerializeField] private double _latitude = 39.299236d;
     [SerializeField] private double _longitude = -76.609383d;
 
-    // fields
+    // URL fetcher
     private UrlFetcher _fetcher;
+    // Layers of renderer
     private readonly Dictionary<int, FragmentsLayer> _renderersMap = new();
     private List<MapRendererFragment> RenderersLayer {
         get {
@@ -35,11 +36,12 @@ public class MapRendererGrid : MonoBehaviour {
         }
     }
 
-
-    private Vector3 _unityPosition;
+    // Get the current bounds of the visible tiles
     public Bounds CurrentBounds { get; private set; }
-
+    // used by tile creation
     private float _fragDx, _fragDy;
+    // TODO
+    private Vector3 _unityPosition;
 
     private void Start() {
         _fragDx = _fragmentSize.x / 100f;
@@ -63,10 +65,6 @@ public class MapRendererGrid : MonoBehaviour {
         Gizmos.DrawSphere(transform.position, 0.15f);
         // current bounds
         Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
-        // index bounds
-        Gizmos.color = Color.white;
-        var ib = new Vector3(_fragDx * (indexMax.x - indexMin.x), _fragDy * (indexMax.y - indexMin.y));
-        Gizmos.DrawWireCube(ib / 2f, ib);
 	}
 
 	public void ReloadUrlFetcher() {
@@ -145,7 +143,8 @@ public class MapRendererGrid : MonoBehaviour {
 
     public void UpdateMap() {
         Vector2Int center = MapUtils.GetTile(_latitude, _longitude, _zoom);
-        foreach(var mr in RenderersLayer) {
+        var visibles = RenderersLayer.FindAll(mr => mr.gameObject.activeSelf);
+        foreach(var mr in visibles) {
             mr.UpdateMap(_fetcher, center.x + mr.IndexI - 1, center.y - mr.IndexJ + 1, _zoom);
 		}
     }
@@ -192,6 +191,8 @@ public class MapRendererGrid : MonoBehaviour {
             }
         }
 
+        // TODO, finally,update elements.
+        UpdateMap();
     }
 
     private List<MapRendererFragment> AddMapElementsColumn(int x, int yMin, int yMax) {
