@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
 
 public class PerspectivePan : MonoBehaviour {
+
     [SerializeField] private float groundZ = 0;
     [SerializeField] private float zoomOutMin = 1;
     [SerializeField] private float zoomOutMax = 8;
     [SerializeField] private float zoomSensitivity = 0.01f;
+    [SerializeField] [Range(1f, 4f)] private float cameraBoundsBuffer = 1.5f;
+
+    public OnMoveEvent moveEvent;
+    public OnZoomEvent zoomEvent;
 
     private Camera _camera;
     private Vector3 _touchStart;
@@ -12,6 +17,15 @@ public class PerspectivePan : MonoBehaviour {
 	private void Start() {
         _camera = GetComponent<Camera>();
 	}
+
+	private void OnDrawGizmos() {
+        Gizmos.color = Color.green;
+        var b = RawCameraBounds;
+        Gizmos.DrawWireCube(b.center, b.size);
+        Gizmos.color = Color.black;
+        b = CameraBounds;
+        Gizmos.DrawWireCube(b.center, b.size);
+    }
 
 	void Update() {
         if(Input.GetMouseButtonDown(0)) {
@@ -30,17 +44,24 @@ public class PerspectivePan : MonoBehaviour {
 
             float difference = currentMagnitude - prevMagnitude;
 
-            Zoom(difference * zoomSensitivity);
+            Zoom(difference * zoomSensitivity, true);
         } else if(Input.GetMouseButton(0)) {
             Vector3 direction = _touchStart - GetWorldPosition(groundZ);
             _camera.transform.position += direction;
+
+            // call event
+            moveEvent?.Invoke();
         }
 
+#if UNITY_EDITOR
         if(Input.GetKey(KeyCode.KeypadPlus)) {
-            Zoom(zoomSensitivity);
-		} else if(Input.GetKey(KeyCode.KeypadMinus)) {
-            Zoom( - zoomSensitivity);
+            Debug.Log("zoom +");
+            Zoom(zoomSensitivity, true);
+        } else if(Input.GetKey(KeyCode.KeypadMinus)) {
+            Debug.Log("zoom -");
+            Zoom(-zoomSensitivity, true);
         }
+#endif
     }
 
     private Vector3 GetWorldPosition(float z) {
@@ -50,7 +71,21 @@ public class PerspectivePan : MonoBehaviour {
 		return mousePos.GetPoint(distance);
     }
 
-    private void Zoom(float increment) {
-        Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - increment, zoomOutMin, zoomOutMax);
+    private float Zoom(float increment, bool triggersEvent) {
+        float orthoSize = Mathf.Clamp(Camera.main.orthographicSize - increment, zoomOutMin, zoomOutMax);
+        Camera.main.orthographicSize = orthoSize;
+
+        // Call event
+        if(triggersEvent)
+            zoomEvent?.Invoke(orthoSize);
+    
+        return orthoSize;
     }
+
+    public Bounds CameraBounds => new(RawCameraBounds.center, RawCameraBounds.size * cameraBoundsBuffer);
+
+    public Bounds RawCameraBounds => Camera.main.OrthographicBounds();
+
+    public delegate void OnMoveEvent();
+    public delegate void OnZoomEvent(float zoom);
 }

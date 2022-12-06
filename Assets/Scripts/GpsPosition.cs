@@ -25,10 +25,18 @@ public class GpsPosition : MonoBehaviour {
 	}
 
 	private void Start() {
+#if UNITY_EDITOR
+        Debug.LogWarning("The plateform is Editor. Creating FAKE location");
+        LastUpdate = Time.time;
+        LocationReady = true;
+        HasLocationEnabled = true;
+        LastPosition = new(39.299236f, -76.609383f);
+#else
         AskLocationPermission();
+#endif
     }
 
-
+    // Method called by #Start when on non-Editor platform.
     private void AskLocationPermission() {
         Debug.Log("Check if user has permission [" + Permission.FineLocation + "]");
         if(Permission.HasUserAuthorizedPermission(Permission.FineLocation)) {
@@ -70,6 +78,9 @@ public class GpsPosition : MonoBehaviour {
         StartCoroutine(GetPositionLoop());
     }
 
+    // On real plateform, shutdown the service.
+#if UNITY_EDITOR
+#else
     private void OnDisable() {
         // Shutdown location on disabling
         if(LocationReady) {
@@ -77,8 +88,9 @@ public class GpsPosition : MonoBehaviour {
             Debug.Log("Location service shutdown.");
         }
 	}
+#endif
 
-	private IEnumerator GetPositionLoop() {
+    private IEnumerator GetPositionLoop() {
         // Starts the location service.
         Input.location.Start();
 

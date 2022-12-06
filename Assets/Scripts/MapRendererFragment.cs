@@ -7,6 +7,10 @@ public class MapRendererFragment : MonoBehaviour {
 
     private SpriteRenderer _spriteRenderer;
     private float _width, _height;
+    private int _i, _j;
+    public int IndexI => _i;
+    public int IndexJ => _j;
+    public Bounds Bounds => _spriteRenderer.bounds;
 
     private void Start() {
         if(!_spriteRenderer)
@@ -17,11 +21,21 @@ public class MapRendererFragment : MonoBehaviour {
             Debug.LogError("Could not find any sprite renderer for MapRenderer " + name + ".");
     }
 
-	public void Init(float width, float height) {
+	public void Init(float width, float height, int i, int j) {
         this._width = width;
         this._height = height;
+        this._i = i;
+        this._j = j;
         if(!_spriteRenderer)
             Start();
+    }
+
+	private void OnDrawGizmos() {
+        Gizmos.color = Color.magenta;
+        var r = GetComponent<SpriteRenderer>();
+        Gizmos.DrawWireCube(r.bounds.center, r.bounds.size);
+        Gizmos.DrawSphere(r.bounds.min, 0.05f);
+        Gizmos.DrawSphere(r.bounds.max, 0.05f);
     }
 
 	private IEnumerator LoadSprite(string url, int x, int y, int zoom) {
@@ -40,7 +54,12 @@ public class MapRendererFragment : MonoBehaviour {
         }
     }
 
+    private bool hasImage = false;
+    private int lastX, lastY, lastZoom;
+
     public void UpdateMap(UrlFetcher fetcher, int x, int y, int zoom) {
+        if(hasImage && lastX == x && lastY == y && lastZoom == zoom)
+            return;
 
         TextureQuery res = TilesBuffer.Instance.TryGet(zoom, x, y);
         if(res.found) {
@@ -49,5 +68,9 @@ public class MapRendererFragment : MonoBehaviour {
             string url = fetcher.CreateUrlTile(x, y, zoom);
             StartCoroutine(LoadSprite(url, x, y, zoom));
         }
+        hasImage = true;
+        lastX = x;
+        lastY = y;
+        lastZoom = zoom;
     }
 }
