@@ -12,13 +12,13 @@ public class MapRendererGridEditor : Editor {
 		if(GUILayout.Button("Update all")) {
 			MapRendererGrid gmap = (MapRendererGrid) target;
 			gmap.ReloadUrlFetcher();
-			gmap.UpdateChildren();
+			gmap.ResetChildren();
 			gmap.UpdateMap();
 		}
 
 		if(GUILayout.Button("Update children only")) {
 			MapRendererGrid gmap = (MapRendererGrid) target;
-			gmap.UpdateChildren();
+			gmap.ResetChildren();
 		}
 
 		if(GUILayout.Button("Update image only")) {
