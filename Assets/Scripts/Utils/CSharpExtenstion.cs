@@ -2,6 +2,8 @@
 
 public static class CSharpExtenstion {
 
+	public delegate void Consumable<T>(T t);
+
 	/// <summary>
 	/// Destroy all children of a gameobject in the hierarchy.
 	/// </summary>
