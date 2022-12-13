@@ -7,7 +7,7 @@ public class MapUtils {
 		return (Math.PI / 180d) * angle;
 	}
 
-	public static Vector2Int GetTile(double latitude, double longitude, int zoom) {
+	public static Vector2Int GetTile(double longitude, double latitude, int zoom) {
 		Vector2Int vec = new();
 
 		double lat_rad = ToRadians(latitude);
@@ -18,6 +18,15 @@ public class MapUtils {
 		return vec;
 	}
 
+	public static Vector2 GetCoordinates(int x, int y, int z) {
+		float n = Mathf.Pow(2, (float) z);
+		float longDeg = x / n * 360f - 180f;
+		double latRad = Math.Atan(Math.Sinh(Math.PI * (1d - 2d * y / n)));
+		float latDeg = (float) (latRad * 180d / Math.PI);
+		return new(longDeg, latDeg);
+	}
+
+	#region deprecated
 	public static int Longitude2ToTileX(double lon, int z) {
 		return (int) (Math.Floor((lon + 180.0) / 360.0 * (1 << z)));
 	}
@@ -32,4 +41,5 @@ public class MapUtils {
 		Debug.Log("latRad=[" + latRad + "], zz=[" + zz + "], d1=[" + d1 + "], d2=[" + d2 + "], d3=[" + d3 + "], val=[" + val + "], valFloor=[" + Math.Floor(val) + "], valFloorInt=[" + ((int) Math.Floor(val)) + "].");
 		return (int) Math.Floor(val);
 	}
+	#endregion
 }

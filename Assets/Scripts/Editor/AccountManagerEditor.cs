@@ -11,7 +11,7 @@ public class AccountManagerEditor : Editor {
 
 		if(GUILayout.Button("TEST LOGIN")) {
 			AccountManager am = (AccountManager) target;
-			am.TryLogin("cochon", "ElleEstTropGros", null);
+			am.TryLogin("cochon", "ElleEstTropGros", null, null);
 		}
 
 	}

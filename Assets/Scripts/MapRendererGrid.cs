@@ -13,11 +13,12 @@ public class MapRendererGrid : MonoBehaviour {
     [SerializeField] private uint _amountX = 3;
     [SerializeField] private uint _amountY = 3;
     [SerializeField] private Vector2 _fragmentSize = new(256, 256);
+    private Vector2 _worldDeltas;
 
     [Header("Position")]
     [SerializeField] private int _zoom = 10;
-    [SerializeField] private double _latitude = 39.299236d;
-    [SerializeField] private double _longitude = -76.609383d;
+    [SerializeField] private double _latitude;
+    [SerializeField] private double _longitude;
 
     // URL fetcher
     private UrlFetcher _fetcher;
@@ -41,9 +42,9 @@ public class MapRendererGrid : MonoBehaviour {
     // used by tile creation
     private float _fragDx, _fragDy;
     // TODO
-    private Vector3 _unityPosition;
     // indexes used by the recalculation.
     private Vector2Int indexMin, indexMax;
+    [SerializeField] private Vector3 _unityPosition;
 
     private void Start() {
         _fragDx = _fragmentSize.x / 100f;
@@ -58,18 +59,16 @@ public class MapRendererGrid : MonoBehaviour {
     /// </summary>
     /// <param name="position">The vector containing latitude and longitude.</param>
     public void SetPosition(Vector2 position) {
-        _latitude  = position.x;
-        _longitude = position.y;
-        _unityPosition = new((float) _latitude, (float) _longitude, transform.position.z);
+        _longitude = position.x;
+        _latitude = position.y;
     }
 
 	private void OnDrawGizmos() {
         //positions
         Gizmos.color = Color.red;
-        Gizmos.DrawSphere(_unityPosition - transform.position, 0.1f);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(transform.position, 0.15f);
+        Gizmos.DrawSphere(_unityPosition, 0.1f);
         // current bounds
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
 	}
 
@@ -92,8 +91,7 @@ public class MapRendererGrid : MonoBehaviour {
         // Remove immediate all children
         var tempList = transform.Cast<Transform>().ToList();
         foreach(var child in tempList) {
-            if(child.gameObject.GetComponent<MapRendererFragment>() != null)
-                DestroyImmediate(child.gameObject);
+            DestroyImmediate(child.gameObject);
         }
 
         // Add new children
@@ -151,6 +149,13 @@ public class MapRendererGrid : MonoBehaviour {
     /// <param name="i">The horizontal unique index.</param>
     /// <param name="j">The vertical unique index.</param>
     private void CreateMapElement(int i, int j) {
+        // we want to be sure to not recretate an already-existing tile.
+        MapRendererFragment f = RenderersLayer.Find(m => m.IndexI == i && m.IndexJ == j);
+        if(f) {
+            f.gameObject.SetActive(true);
+            return;
+        }
+        // Create the fragment.
         GameObject go = new("map_" + i + "_" + j);
         var mapPart = go.GetOrAddComponent<MapRendererFragment>();
         mapPart.Init(_fragmentSize.x, _fragmentSize.y, i, j);
@@ -165,12 +170,15 @@ public class MapRendererGrid : MonoBehaviour {
     /// </summary>
     public void UpdateMap() {
         // Get the tiles-to-worldmap-tile indexes
-        Vector2Int center = MapUtils.GetTile(_latitude, _longitude, _zoom);
+        Vector2Int center = MapUtils.GetTile(_longitude, _latitude, _zoom);
 
-        // Iterates threw visibles tiles to update the image
-        foreach(var mr in RenderersLayer.FindAll(mr => mr.gameObject.activeSelf)) {
+        var visibles = RenderersLayer.FindAll(mr => mr.gameObject.activeSelf);
+        foreach(var mr in visibles) {
             mr.UpdateMap(_fetcher, center.x + mr.IndexI - 1, center.y - mr.IndexJ + 1, _zoom);
 		}
+
+        _worldDeltas = GetWorldDeltas();
+        _unityPosition = GetUnityPositionFromWorld(new Vector2((float) _longitude, (float) _latitude));
     }
 
     public void UpdateGridVisibility() {
@@ -259,8 +267,42 @@ public class MapRendererGrid : MonoBehaviour {
         if(RenderersLayerContainer.childCount == 0) {
             var cameraBounds = PerspectivePan.Instance.RawCameraBounds;
             CreateMapElement((int) (cameraBounds.center.y / _fragDy), (int) (cameraBounds.center.x / _fragDy));
-		}
+        }
         // update grid.
         UpdateGridVisibility();
+    }
+
+    private Vector2 GetWorldDeltas() {
+        // a priori, j'aurais au moins le (0,0), le (1,0) et le (0,1).
+        var t00 = MapRendererFragment.CENTER;
+        var t10 = RenderersLayer.Find(m => m.IndexI == 1 && m.IndexJ == 0);
+        var t01 = RenderersLayer.Find(m => m.IndexI == 0 && m.IndexJ == 1);
+        if(!(t00 && t10 && t01)) {
+            Debug.LogWarning("[GetUnityPositionFromWorld] Could NOT get all elements (" + t00 + ", " + t10 + "," + t01 + ")");
+            return new();
+        }
+        Debug.Log("test des tiles. t00=" + t00.name + t00.WorldPosition+ ", t01=" + t01.name+t01.WorldPosition + ", t10=" + t10.name+t10.WorldPosition);
+        float worldTileDx = t10.WorldPosition.x - t00.WorldPosition.x;
+        float worldTileDy = t01.WorldPosition.y - t00.WorldPosition.y;
+        Debug.Log("World D=(" + worldTileDx + ", " + worldTileDy + ").");
+        return new(worldTileDx, worldTileDy);
+    }
+
+    public Vector2 GetUnityPositionFromWorld(Vector2 worldCoordinates) {
+        var center = MapRendererFragment.CENTER;
+        Debug.Log("------------------------------------------------");
+
+        float distanceWorldX = worldCoordinates.x - center.WorldPosition.x;
+        float distanceWorldY = worldCoordinates.y - center.WorldPosition.y;
+        Debug.Log("worldCoos = " + worldCoordinates + ". centerTileWorldCoos="+center.WorldPosition+", distancesInWorld = (" + distanceWorldX + ", " + distanceWorldY + ").");
+
+        float distanceUnityX = _worldDeltas.x * distanceWorldX * _fragDx * 10f;
+        float distanceUnityY = _worldDeltas.y * distanceWorldY * _fragDy * 10f;
+
+        Vector2 originalUnityPosition = center.TopLeft;
+        Vector2 destination = originalUnityPosition + new Vector2(distanceUnityX, distanceUnityY);
+        Debug.Log("distancesInUnity = (" + distanceUnityX + ", " + distanceUnityY + "). destination = " + destination);
+
+        return destination;
 	}
 }

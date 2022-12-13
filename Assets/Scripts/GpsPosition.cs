@@ -9,6 +9,10 @@ public class GpsPosition : MonoBehaviour {
     [Tooltip("Duration between two updates of position")]
     [Range(1f, 5f)] [SerializeField] private float updatePositionAfter = 2f;
 
+    [Header("Debug")]
+    [SerializeField] private float _defaultLatitude = 39.299236f;
+    [SerializeField] private float _defaultLongitude = -76.609383f;
+
     public bool HasLocationEnabled { get; private set; }
     public bool LocationReady { get; private set; }
     public Vector2 LastPosition { get; private set; }
@@ -26,11 +30,11 @@ public class GpsPosition : MonoBehaviour {
 
 	private void Start() {
 #if UNITY_EDITOR
-        Debug.LogWarning("The plateform is Editor. Creating FAKE location");
         LastUpdate = Time.time;
         LocationReady = true;
         HasLocationEnabled = true;
-        LastPosition = new(39.299236f, -76.609383f);
+        LastPosition = new(_defaultLongitude, _defaultLatitude);
+        Debug.LogWarning("The plateform is Editor. Creating FAKE location : " + LastPosition);
 #else
         AskLocationPermission();
 #endif
@@ -118,9 +122,9 @@ public class GpsPosition : MonoBehaviour {
 
         while(Input.location.status == LocationServiceStatus.Running) {
             yield return new WaitForSeconds(updatePositionAfter);
-            LastPosition = new(Input.location.lastData.latitude, Input.location.lastData.longitude);
+            LastPosition = new(Input.location.lastData.longitude, Input.location.lastData.latitude);
             LastUpdate = Input.location.lastData.timestamp;
-            //Debug.Log("Position = "+LastPosition+" at " + LastUpdate+".");
+            Debug.Log("Position = "+LastPosition+". time=" + LastUpdate+".");
         }
 
         LocationReady = false;

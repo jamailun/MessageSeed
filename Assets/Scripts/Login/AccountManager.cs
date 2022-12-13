@@ -34,13 +34,13 @@ public class AccountManager : MonoBehaviour {
 	}
 
 
-	public void TryLogin(string username, string password, CSharpExtenstion.Consumable<string> errorCallback) {
+	public void TryLogin(string username, string password, CSharpExtension.Consumable<string> errorCallback = null, CSharpExtension.Runnable successCallback = null) {
 		if(IsLogged) {
 			Debug.LogWarning("Tried to log-in... But you're already logged-in !");
 			return;
 		}
 		Debug.Log("Sending request...");
-		StartCoroutine(CR_SendLogin(username, password, errorCallback));
+		StartCoroutine(CR_SendLogin(username, password, errorCallback, successCallback));
 	}
 
 	private void SetLoginComplete(LoginResponse response, string username) {
@@ -53,7 +53,7 @@ public class AccountManager : MonoBehaviour {
 		SceneManager.LoadScene(mainSceneName);
 	}
 
-	private IEnumerator CR_SendLogin(string user, string password, CSharpExtenstion.Consumable<string> errorCallback) {
+	private IEnumerator CR_SendLogin(string user, string password, CSharpExtension.Consumable<string> errorCallback, CSharpExtension.Runnable successCallback) {
 		string postData = JsonUtility.ToJson(new LoginRequest(user, password));
 		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
 
@@ -69,6 +69,7 @@ public class AccountManager : MonoBehaviour {
 			} else {
 				var data = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
 				SetLoginComplete(data, user);
+				successCallback?.Invoke();
 			}
 		}
 	}

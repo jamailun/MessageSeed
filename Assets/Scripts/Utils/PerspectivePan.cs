@@ -46,7 +46,7 @@ public class PerspectivePan : MonoBehaviour {
 
 	void Update() {
         if(Input.GetMouseButtonDown(0)) {
-            _touchStart = GetWorldPosition(groundZ);
+            _touchStart = GetUnityWorldPosition(groundZ);
         }
 
         if(Input.touchCount == 2) {
@@ -63,7 +63,7 @@ public class PerspectivePan : MonoBehaviour {
 
             Zoom(difference * zoomSensitivity, true);
         } else if(Input.GetMouseButton(0)) {
-            Vector3 direction = _touchStart - GetWorldPosition(groundZ);
+            Vector3 direction = _touchStart - GetUnityWorldPosition(groundZ);
             Move(direction);
         }
 
@@ -84,7 +84,8 @@ public class PerspectivePan : MonoBehaviour {
 #endif
     }
 
-    private Vector3 GetWorldPosition(float z) {
+    // nothing to do with real world coordinates !
+    private Vector3 GetUnityWorldPosition(float z) {
         Ray mousePos = _camera.ScreenPointToRay(Input.mousePosition);
         Plane ground = new(Vector3.forward, new Vector3(0, 0, z));
 		ground.Raycast(mousePos, out float distance);

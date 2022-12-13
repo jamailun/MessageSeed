@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
-public static class CSharpExtenstion {
+public static class CSharpExtension {
 
-	public delegate void Consumable<T>(T t);
+	public delegate void Consumable<T>(T value);
+	public delegate void Runnable();
 
 	/// <summary>
 	/// Destroy all children of a gameobject in the hierarchy.
