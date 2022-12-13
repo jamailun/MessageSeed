@@ -2,6 +2,8 @@
 
 public class PerspectivePan : MonoBehaviour {
 
+    public static PerspectivePan Instance { get; private set; }
+
     [SerializeField] private float groundZ = 0;
     [SerializeField] private float zoomOutMin = 1;
     [SerializeField] private float zoomOutMax = 8;
@@ -11,12 +13,27 @@ public class PerspectivePan : MonoBehaviour {
     public OnMoveEvent moveEvent;
     public OnZoomEvent zoomEvent;
 
+    private float _zoomInit;
     private Camera _camera;
     private Vector3 _touchStart;
 
+    [SerializeField] [Range(1f, 5f)] private float _zoomThresholdMin = 1.5f;
+    [SerializeField] [Range(5f, 10f)] private float _zoomThresholdMax = 6.5f;
+    public float ZoomMinThreshold => _zoomThresholdMin;
+    public float ZoomMaxThreshold => _zoomThresholdMax;
+
+	private void Awake() {
+		if(Instance) {
+            Destroy(gameObject);
+            return;
+		}
+        Instance = this;
+	}
+
 	private void Start() {
         _camera = GetComponent<Camera>();
-	}
+        _zoomInit = _camera.orthographicSize;
+    }
 
 	private void OnDrawGizmos() {
         Gizmos.color = Color.green;
@@ -47,19 +64,22 @@ public class PerspectivePan : MonoBehaviour {
             Zoom(difference * zoomSensitivity, true);
         } else if(Input.GetMouseButton(0)) {
             Vector3 direction = _touchStart - GetWorldPosition(groundZ);
-            _camera.transform.position += direction;
-
-            // call event
-            moveEvent?.Invoke();
+            Move(direction);
         }
 
 #if UNITY_EDITOR
         if(Input.GetKey(KeyCode.KeypadPlus)) {
-            Debug.Log("zoom +");
             Zoom(zoomSensitivity, true);
         } else if(Input.GetKey(KeyCode.KeypadMinus)) {
-            Debug.Log("zoom -");
             Zoom(-zoomSensitivity, true);
+        } else if(Input.GetKey(KeyCode.LeftArrow)) {
+            Move(Vector2.left * Time.deltaTime);
+        } else if(Input.GetKey(KeyCode.RightArrow)) {
+            Move(Vector2.right * Time.deltaTime);
+        } else if(Input.GetKey(KeyCode.UpArrow)) {
+            Move(Vector2.up * Time.deltaTime);
+        } else if(Input.GetKey(KeyCode.DownArrow)) {
+            Move(Vector2.down * Time.deltaTime);
         }
 #endif
     }
@@ -71,7 +91,13 @@ public class PerspectivePan : MonoBehaviour {
 		return mousePos.GetPoint(distance);
     }
 
-    private float Zoom(float increment, bool triggersEvent) {
+	private void Move(Vector3 direction) {
+        _camera.transform.position += direction;
+        // call event
+        moveEvent?.Invoke();
+    }
+
+	private float Zoom(float increment, bool triggersEvent) {
         float orthoSize = Mathf.Clamp(Camera.main.orthographicSize - increment, zoomOutMin, zoomOutMax);
         Camera.main.orthographicSize = orthoSize;
 
@@ -80,6 +106,10 @@ public class PerspectivePan : MonoBehaviour {
             zoomEvent?.Invoke(orthoSize);
     
         return orthoSize;
+    }
+
+    public void ResetZoom() {
+        Camera.main.orthographicSize = _zoomInit;
     }
 
     public Bounds CameraBounds => new(RawCameraBounds.center, RawCameraBounds.size * cameraBoundsBuffer);

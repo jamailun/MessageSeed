@@ -42,15 +42,21 @@ public class MapRendererGrid : MonoBehaviour {
     private float _fragDx, _fragDy;
     // TODO
     private Vector3 _unityPosition;
+    // indexes used by the recalculation.
+    private Vector2Int indexMin, indexMax;
 
     private void Start() {
         _fragDx = _fragmentSize.x / 100f;
         _fragDy = _fragmentSize.y / 100f;
 
         ReloadUrlFetcher();
-        UpdateChildren();
+        ResetChildren();
     }
 
+    /// <summary>
+    /// Set the position on the world.
+    /// </summary>
+    /// <param name="position">The vector containing latitude and longitude.</param>
     public void SetPosition(Vector2 position) {
         _latitude  = position.x;
         _longitude = position.y;
@@ -67,6 +73,9 @@ public class MapRendererGrid : MonoBehaviour {
         Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
 	}
 
+    /// <summary>
+    /// Reload the URL fetcher from the serializedField attributes.
+    /// </summary>
 	public void ReloadUrlFetcher() {
         _fetcher = _provider switch {
             UrlProvider.GoogleApi => new GoogleMapUrlFetcher(_providerToken, (uint) _fragmentSize.x, (uint) _fragmentSize.y),
@@ -76,7 +85,10 @@ public class MapRendererGrid : MonoBehaviour {
         };
     }
 
-    public void UpdateChildren() {
+    /// <summary>
+    /// Reset all grid fragments. Remove old ones, and recreate them all.
+    /// </summary>
+    public void ResetChildren() {
         // Remove immediate all children
         var tempList = transform.Cast<Transform>().ToList();
         foreach(var child in tempList) {
@@ -96,8 +108,10 @@ public class MapRendererGrid : MonoBehaviour {
         Debug.Log("current bounds = " + CurrentBounds);
     }
 
-    private Vector2Int indexMin, indexMax;
-    // Recalculate bounds after children updates
+    /// <summary>
+    /// Recalculate bounds after children updates
+    /// </summary>
+    /// <returns>a list of all visible fragments.</returns>
     private List<MapRendererFragment> RecalculateBounds() {
         indexMin = new(int.MaxValue, int.MaxValue);
         indexMax = new(int.MinValue, int.MinValue);
@@ -131,6 +145,11 @@ public class MapRendererGrid : MonoBehaviour {
         return visibleFragments;
     }
 
+    /// <summary>
+    /// Create a new grid fragment.
+    /// </summary>
+    /// <param name="i">The horizontal unique index.</param>
+    /// <param name="j">The vertical unique index.</param>
     private void CreateMapElement(int i, int j) {
         GameObject go = new("map_" + i + "_" + j);
         var mapPart = go.GetOrAddComponent<MapRendererFragment>();
@@ -141,15 +160,21 @@ public class MapRendererGrid : MonoBehaviour {
         RenderersLayer.Add(mapPart);
     }
 
+    /// <summary>
+    /// Update the image of all the visibles fragments.
+    /// </summary>
     public void UpdateMap() {
+        // Get the tiles-to-worldmap-tile indexes
         Vector2Int center = MapUtils.GetTile(_latitude, _longitude, _zoom);
-        var visibles = RenderersLayer.FindAll(mr => mr.gameObject.activeSelf);
-        foreach(var mr in visibles) {
+
+        // Iterates threw visibles tiles to update the image
+        foreach(var mr in RenderersLayer.FindAll(mr => mr.gameObject.activeSelf)) {
             mr.UpdateMap(_fetcher, center.x + mr.IndexI - 1, center.y - mr.IndexJ + 1, _zoom);
 		}
     }
 
-    public void UpdateGridVisibility(Bounds camera) {
+    public void UpdateGridVisibility() {
+        Bounds camera = PerspectivePan.Instance.CameraBounds;
         // Hide non-visible tiles.
         foreach(var mr in RenderersLayer) {
             mr.gameObject.SetActive(mr.Bounds.Intersects2D(camera));
@@ -221,4 +246,21 @@ public class MapRendererGrid : MonoBehaviour {
             _renderersMap[_zoom] = new(obj.transform);
         }
     }
+
+    public void ZoomLayerChange(bool zoomIn) {
+        // Hide old layer
+        RenderersLayerContainer.gameObject.SetActive(false);
+        // Update zoom value.
+        _zoom += (zoomIn ? 1 : -1);
+        Debug.LogWarning("zoom changed. new zoom = " + _zoom);
+        // Get new layer and show it
+        RenderersLayerContainer.gameObject.SetActive(true);
+        // If empty, create a first elem
+        if(RenderersLayerContainer.childCount == 0) {
+            var cameraBounds = PerspectivePan.Instance.RawCameraBounds;
+            CreateMapElement((int) (cameraBounds.center.y / _fragDy), (int) (cameraBounds.center.x / _fragDy));
+		}
+        // update grid.
+        UpdateGridVisibility();
+	}
 }

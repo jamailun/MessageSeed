@@ -3,21 +3,21 @@
 public class MapUpdater : MonoBehaviour {
 
 	[SerializeField] private MapRendererGrid _mapRenderer;
-	[SerializeField] private PerspectivePan _perspectiveController;
 
 	private double _lastUpdate = 0;
 
-	#region events registration
-	private void OnEnable() {
-		_perspectiveController.moveEvent += UserMoved;
-		_perspectiveController.zoomEvent += UserZoomed;
+
+	private void Start() {
+		PerspectivePan.Instance.moveEvent += UserMoved;
+		PerspectivePan.Instance.zoomEvent += UserZoomed;
+		// on startup, init renderers
+		PostModification();
 	}
 
 	private void OnDisable() {
-		_perspectiveController.moveEvent -= UserMoved;
-		_perspectiveController.zoomEvent -= UserZoomed;
+		PerspectivePan.Instance.moveEvent -= UserMoved;
+		PerspectivePan.Instance.zoomEvent -= UserZoomed;
 	}
-	#endregion
 
 	private void Update() {
 		// changement de position
@@ -30,24 +30,35 @@ public class MapUpdater : MonoBehaviour {
 	}
 
 	private void UserMoved() {
-		// pour l'instant, on vérifie que l'utilisateur ait toujours tout en face.
+		// Simply check camera can see every tiles
 		PostModification();
 	}
 
 	private void UserZoomed(float z) {
 		// nouvelle valeur du zoom en int ??
-		Debug.Log("new zoom = " + z);
-		// pour l'instant, on vérifie que l'utilisateur ait toujours tout en face.
-		PostModification();
+		Debug.Log("user zoomed = " + z);
+		if(z <= PerspectivePan.Instance.ZoomMinThreshold) {
+			//Zoom in !
+			_mapRenderer.ZoomLayerChange(true);
+			PerspectivePan.Instance.ResetZoom();
+		} else if(z >= PerspectivePan.Instance.ZoomMaxThreshold) {
+			//Zoom out !
+			_mapRenderer.ZoomLayerChange(false);
+			PerspectivePan.Instance.ResetZoom();
+		} else {
+			// simple check
+			PostModification();
+		}
 	}
 
 	private void PostModification() {
 		// check si la caméra est contenu dans la grid existante
-		Bounds camera = _perspectiveController.CameraBounds;
+		Bounds camera = PerspectivePan.Instance.CameraBounds;
 		Bounds grid = _mapRenderer.CurrentBounds;
+
+		// Camera not completely inside grid : update renderers
 		if(! grid.Contains2D(camera)) {
-			//Debug.Log("camera NOT completely inside grid.");
-			_mapRenderer.UpdateGridVisibility(camera);
+			_mapRenderer.UpdateGridVisibility();
 		}
 	}
 
