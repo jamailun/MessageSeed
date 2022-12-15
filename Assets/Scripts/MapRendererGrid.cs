@@ -20,6 +20,7 @@ public class MapRendererGrid : MonoBehaviour {
     [SerializeField] private double _latitude;
     [SerializeField] private double _longitude;
 
+    public int Zoom => _zoom;
     // URL fetcher
     private UrlFetcher _fetcher;
     // Layers of renderer
@@ -41,10 +42,14 @@ public class MapRendererGrid : MonoBehaviour {
     public Bounds CurrentBounds { get; private set; }
     // used by tile creation
     private float _fragDx, _fragDy;
-    // TODO
     // indexes used by the recalculation.
     private Vector2Int indexMin, indexMax;
+
+    // current user position in Unity
     [SerializeField] private Vector3 _unityPosition;
+
+    // Visible messages
+    private readonly List<Message> visibleMessages = new();
 
     private void Start() {
         _fragDx = _fragmentSize.x / 100f;
@@ -62,6 +67,15 @@ public class MapRendererGrid : MonoBehaviour {
         _longitude = position.x;
         _latitude = position.y;
     }
+
+    public void UpdateMessages(IEnumerable<Message> messages) {
+        //XXX To improve. For now, just replace the list.
+        visibleMessages.Clear();
+        visibleMessages.AddRange(messages);
+        foreach(var m in messages) {
+            
+		}
+	}
 
 	private void OnDrawGizmos() {
         //positions
@@ -270,6 +284,7 @@ public class MapRendererGrid : MonoBehaviour {
         }
         // update grid.
         UpdateGridVisibility();
+        _worldDeltas = GetWorldDeltas(); // we update the worlddeltas.
     }
 
     private Vector2 GetWorldDeltas() {

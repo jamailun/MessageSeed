@@ -19,11 +19,11 @@ public class MessagesManager : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 	}
 
-	public void UpdateMessages(double longitude, double latitude, int zoom) {
-		StartCoroutine(CR_UpdateMessagesRequest(longitude, latitude, zoom));
+	public void UpdateMessages(double longitude, double latitude, int zoom, CSharpExtension.Consumable<IEnumerable<Message>> callback = null) {
+		StartCoroutine(CR_UpdateMessagesRequest(longitude, latitude, zoom, callback));
 	}
 
-	private IEnumerator CR_UpdateMessagesRequest(double longitude, double latitude, int zoom) {
+	private IEnumerator CR_UpdateMessagesRequest(double longitude, double latitude, int zoom, CSharpExtension.Consumable<IEnumerable<Message>> callback) {
 
 		// DEBUG ONLY
 		yield return new WaitForEndOfFrame();
@@ -43,6 +43,8 @@ public class MessagesManager : MonoBehaviour {
 				Debug.Log("success get tiles !");
 			}
 		}*/
+
+		callback?.Invoke(messages);
 	}
 
 	public Message CreateNewMessage(string title, string content, int fertilizerAmount) {
