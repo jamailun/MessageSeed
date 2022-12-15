@@ -8,6 +8,7 @@ public class MapRendererGrid : MonoBehaviour {
     [SerializeField] private UrlProvider _provider;
     [SerializeField] private string _providerToken;
     [SerializeField] private Sprite _defaultSprite;
+    [SerializeField] private MessageRenderer _messageRendererPrefab;
 
     [Header("Size")]
     [SerializeField] private uint _amountX = 3;
@@ -73,8 +74,15 @@ public class MapRendererGrid : MonoBehaviour {
         visibleMessages.Clear();
         visibleMessages.AddRange(messages);
         foreach(var m in messages) {
-            
+            CreateMessageRenderer(m);
 		}
+	}
+
+    private void CreateMessageRenderer(Message message) {
+        var renderer = Instantiate(_messageRendererPrefab);
+        renderer.SetMessage(message);
+        renderer.transform.position = GetUnityPositionFromWorld(message.RealWorldPosition);
+        Debug.LogWarning("new message : " + renderer + ", at " + renderer.transform.position);
 	}
 
 	private void OnDrawGizmos() {

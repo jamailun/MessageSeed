@@ -16,7 +16,7 @@ public class AccountManager : MonoBehaviour {
 	public static bool IsLogged => Token != null;
 
 	public static bool IsMe(string id) {
-		return id == Account.accountId;
+		return Account != null && id == Account.accountId;
 	}
 
 	private void Start() {

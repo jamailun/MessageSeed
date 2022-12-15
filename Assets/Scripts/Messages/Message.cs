@@ -33,7 +33,7 @@ public class Message {
 		authorId = author.accountId;
 	}
 
-	public Vector2 Position {
+	public Vector2 RealWorldPosition {
 		set { longitude = value.x; latitude = value.y; }
 		get { return new(longitude, latitude); }
 	}

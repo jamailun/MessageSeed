@@ -31,9 +31,9 @@ public class MessagesManager : MonoBehaviour {
 		messages.Add(Message.DebugMessage(1));
 		messages.Add(Message.DebugMessage(2));
 		messages.Add(Message.DebugMessage(3));
-		messages[0].Position = GpsPosition.Instance.LastPosition + new Vector2(0.02f, 0.02f);
-		messages[1].Position = GpsPosition.Instance.LastPosition - new Vector2(0.02f, 0.02f);
-		messages[2].Position = GpsPosition.Instance.LastPosition + new Vector2(0.05f, 0.01f);
+		messages[0].RealWorldPosition = GpsPosition.Instance.LastPosition + new Vector2(0.02f, 0.02f);
+		messages[1].RealWorldPosition = GpsPosition.Instance.LastPosition - new Vector2(0.02f, 0.02f);
+		messages[2].RealWorldPosition = GpsPosition.Instance.LastPosition + new Vector2(0.05f, 0.01f);
 
 		/*using(var www = RemoteApiManager.Instance.CreateGetRequest("/messages/")) {
 			yield return www.SendWebRequest();
@@ -50,7 +50,7 @@ public class MessagesManager : MonoBehaviour {
 	public Message CreateNewMessage(string title, string content, int fertilizerAmount) {
 		// Send request
 		var msg = new Message(AccountManager.Account, title, content) {
-			Position = GpsPosition.Instance.LastPosition
+			RealWorldPosition = GpsPosition.Instance.LastPosition
 		};
 		// fertilizerAmount ??
 
