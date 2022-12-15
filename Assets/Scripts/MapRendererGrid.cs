@@ -8,6 +8,7 @@ public class MapRendererGrid : MonoBehaviour {
     [SerializeField] private UrlProvider _provider;
     [SerializeField] private string _providerToken;
     [SerializeField] private Sprite _defaultSprite;
+    [SerializeField] private MessageRenderer _messageRendererPrefab;
 
     [Header("Size")]
     [SerializeField] private uint _amountX = 3;
@@ -20,6 +21,7 @@ public class MapRendererGrid : MonoBehaviour {
     [SerializeField] private double _latitude;
     [SerializeField] private double _longitude;
 
+    public int Zoom => _zoom;
     // URL fetcher
     private UrlFetcher _fetcher;
     // Layers of renderer
@@ -41,10 +43,14 @@ public class MapRendererGrid : MonoBehaviour {
     public Bounds CurrentBounds { get; private set; }
     // used by tile creation
     private float _fragDx, _fragDy;
-    // TODO
     // indexes used by the recalculation.
     private Vector2Int indexMin, indexMax;
+
+    // current user position in Unity
     [SerializeField] private Vector3 _unityPosition;
+
+    // Visible messages
+    private readonly List<Message> visibleMessages = new();
 
     private void Start() {
         _fragDx = _fragmentSize.x / 100f;
@@ -62,6 +68,22 @@ public class MapRendererGrid : MonoBehaviour {
         _longitude = position.x;
         _latitude = position.y;
     }
+
+    public void UpdateMessages(IEnumerable<Message> messages) {
+        //XXX To improve. For now, just replace the list.
+        visibleMessages.Clear();
+        visibleMessages.AddRange(messages);
+        foreach(var m in messages) {
+            CreateMessageRenderer(m);
+		}
+	}
+
+    private void CreateMessageRenderer(Message message) {
+        var renderer = Instantiate(_messageRendererPrefab);
+        renderer.SetMessage(message);
+        renderer.transform.position = GetUnityPositionFromWorld(message.RealWorldPosition);
+        Debug.LogWarning("new message : " + renderer + ", at " + renderer.transform.position);
+	}
 
 	private void OnDrawGizmos() {
         //positions
@@ -270,6 +292,7 @@ public class MapRendererGrid : MonoBehaviour {
         }
         // update grid.
         UpdateGridVisibility();
+        _worldDeltas = GetWorldDeltas(); // we update the worlddeltas.
     }
 
     private Vector2 GetWorldDeltas() {

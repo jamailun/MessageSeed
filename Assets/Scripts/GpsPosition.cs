@@ -30,7 +30,7 @@ public class GpsPosition : MonoBehaviour {
 
 	private void Start() {
 #if UNITY_EDITOR
-        LastUpdate = Time.time;
+        LastUpdate = Time.time + 5f;
         LocationReady = true;
         HasLocationEnabled = true;
         LastPosition = new(_defaultLongitude, _defaultLatitude);

@@ -10,16 +10,13 @@ public class AccountManager : MonoBehaviour {
 	[Header("Configuration")]
 	[SerializeField] private string mainSceneName = "MainScene";
 
-	[Header("Host")]
-	[SerializeField] private string _serverUrl = "http://54.38.191.243:8080/";
-
 	public static string Token { get; private set; }
 	private static string TokenRefresh { get; set; }
 	public static Account Account { get; private set; }
 	public static bool IsLogged => Token != null;
 
 	public static bool IsMe(string id) {
-		return id == Account.accountId;
+		return Account != null && id == Account.accountId;
 	}
 
 	private void Start() {
@@ -57,10 +54,10 @@ public class AccountManager : MonoBehaviour {
 		string postData = JsonUtility.ToJson(new LoginRequest(user, password));
 		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
 
-		var url = Url("/auth/login/");
+		var url = RemoteApiManager.Instance.GetUrl("/auth/login/");
 		Debug.Log("Sending '" + postData + "' to " + url);
 
-		using(UnityWebRequest www = CreatePostRequest(url, postDataRaw)) {
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest(url, postDataRaw)) {
 			yield return www.SendWebRequest();
 
 			if(www.result != UnityWebRequest.Result.Success) {
@@ -72,20 +69,6 @@ public class AccountManager : MonoBehaviour {
 				successCallback?.Invoke();
 			}
 		}
-	}
-
-	private UnityWebRequest CreatePostRequest(string url, byte[] param) {
-		var www = UnityWebRequest.Put(url, param);
-		www.method = "POST"; // workaround to easily pass bytes
-		www.SetRequestHeader("Content-Type", "application/json");
-		//www.chunkedTransfer = false;
-		return www;
-	}
-
-	private string Url(string suffix) {
-		if(_serverUrl.EndsWith('/') && suffix.StartsWith('/'))
-			suffix = suffix[1..];
-		return _serverUrl + suffix;
 	}
 }
 

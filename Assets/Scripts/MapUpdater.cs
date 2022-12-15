@@ -23,9 +23,11 @@ public class MapUpdater : MonoBehaviour {
 		// changement de position
 		if(GpsPosition.Instance.LocationReady && GpsPosition.Instance.LastUpdate > _lastUpdate) {
 			_lastUpdate = GpsPosition.Instance.LastUpdate;
+			var position = GpsPosition.Instance.LastPosition;
 			Debug.Log("Update (" + _lastUpdate + ") : [" + GpsPosition.Instance.LastPosition.x + "; " + GpsPosition.Instance.LastPosition.y + "]");
-			_mapRenderer.SetPosition(GpsPosition.Instance.LastPosition);
+			_mapRenderer.SetPosition(position);
 			_mapRenderer.UpdateMap();
+			MessagesManager.Instance.UpdateMessages(position.x, position.y, _mapRenderer.Zoom, _mapRenderer.UpdateMessages);
 		}
 	}
 
