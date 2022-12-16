@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class messageTextTransfer : MonoBehaviour
 {
-    private string input;
+    [SerializeField] private TMPro.TMP_InputField textfield;
+    [SerializeField] private TMPro.TMP_InputField header;
 
-    public void ReadInput(string message) {
 
-        input = message;
-        Debug.Log(input);
+    public void ReadInput() {
+
+        Debug.Log(header.text);
+        Debug.Log(textfield.text);   
     }
 }

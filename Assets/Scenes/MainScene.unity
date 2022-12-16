@@ -132,27 +132,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6812616}
-  - component: {fileID: 6812615}
   m_Layer: 0
   m_Name: GameObject to hide/show open
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &6812615
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6812614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c10108b54d677342a66606922a4f839, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  button: {fileID: 1682179787}
+  m_IsActive: 0
 --- !u!4 &6812616
 Transform:
   m_ObjectHideFlags: 0
@@ -348,7 +334,7 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1862670911}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: messageTextTransfer, MessageSeed
         m_MethodName: ReadInput
         m_Mode: 0
@@ -620,30 +606,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 368749571}
-  - component: {fileID: 368749570}
   m_Layer: 0
   m_Name: GameObject for messages
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &368749570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 368749569}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 483eab8f7eb2159418f2fb2d81b6931c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buttonsprite:
-  - {fileID: 21300000, guid: 498f4fa829e4c1c4f8abe889315eb558, type: 3}
-  - {fileID: 21300000, guid: cdeb1109232505843aa5b4705a834093, type: 3}
-  targetbutton: {fileID: 1709432496}
+  m_IsActive: 0
 --- !u!4 &368749571
 Transform:
   m_ObjectHideFlags: 0
@@ -1210,8 +1179,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 37.5, y: -1259}
-  m_SizeDelta: {x: -75, y: -20}
+  m_AnchoredPosition: {x: 0, y: -1283.7467}
+  m_SizeDelta: {x: 0, y: -69.4934}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &704271693
 MonoBehaviour:
@@ -1632,10 +1601,10 @@ RectTransform:
   m_Father: {fileID: 704271692}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 134.5, y: -188}
+  m_SizeDelta: {x: 269, y: 376}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &928618131
 MonoBehaviour:
@@ -1895,6 +1864,7 @@ GameObject:
   - component: {fileID: 1221961046}
   - component: {fileID: 1221961045}
   - component: {fileID: 1221961048}
+  - component: {fileID: 1221961049}
   m_Layer: 5
   m_Name: header text
   m_TagString: Untagged
@@ -1985,7 +1955,7 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1862670911}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: messageTextTransfer, MessageSeed
         m_MethodName: ReadInput
         m_Mode: 0
@@ -2091,6 +2061,20 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1221961049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221961043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c7938bafe257804d8dd7bbd421c6e15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textfield: {fileID: 0}
+  header: {fileID: 0}
 --- !u!1 &1252118187
 GameObject:
   m_ObjectHideFlags: 0
@@ -2163,6 +2147,8 @@ GameObject:
   - component: {fileID: 1260984335}
   - component: {fileID: 1260984334}
   - component: {fileID: 1260984337}
+  - component: {fileID: 1260984338}
+  - component: {fileID: 1260984339}
   m_Layer: 5
   m_Name: Save
   m_TagString: Untagged
@@ -2235,10 +2221,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1862670911}
-        m_TargetAssemblyTypeName: messageTextTransfer, MessageSeed
-        m_MethodName: ReadInput
-        m_Mode: 5
+      - m_Target: {fileID: 1682179793}
+        m_TargetAssemblyTypeName: HideShow, MessageSeed
+        m_MethodName: WhenButtonIsClicked
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2259,21 +2245,21 @@ MonoBehaviour:
           m_StringArgument: ShowEditor
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 368749570}
-        m_TargetAssemblyTypeName: changeImage, MessageSeed
-        m_MethodName: ChangeSprite
+      - m_Target: {fileID: 1260984339}
+        m_TargetAssemblyTypeName: messageTextTransfer, MessageSeed
+        m_MethodName: ReadInput
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: test
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 6812615}
-        m_TargetAssemblyTypeName: HideShow, MessageSeed
-        m_MethodName: WhenButtonIsClicked
+      - m_Target: {fileID: 1709432499}
+        m_TargetAssemblyTypeName: changeImage, MessageSeed
+        m_MethodName: ChangeSprite
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2341,6 +2327,33 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &1260984338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260984332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c10108b54d677342a66606922a4f839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 1260984332}
+--- !u!114 &1260984339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260984332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c7938bafe257804d8dd7bbd421c6e15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textfield: {fileID: 102363462}
+  header: {fileID: 1221961045}
 --- !u!1 &1424059240
 GameObject:
   m_ObjectHideFlags: 0
@@ -2376,8 +2389,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 7.5, y: 0}
+  m_SizeDelta: {x: -15, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1424059242
 MonoBehaviour:
@@ -2433,7 +2446,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2720,8 +2733,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.0000076293945, y: 0}
+  m_SizeDelta: {x: -0.000015259, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1675467239
 MonoBehaviour:
@@ -2990,6 +3003,8 @@ GameObject:
   - component: {fileID: 1682179791}
   - component: {fileID: 1682179790}
   - component: {fileID: 1682179789}
+  - component: {fileID: 1682179792}
+  - component: {fileID: 1682179793}
   m_Layer: 5
   m_Name: open
   m_TagString: Untagged
@@ -3073,7 +3088,7 @@ MonoBehaviour:
           m_StringArgument: Show
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2088861639}
+      - m_Target: {fileID: 1682179792}
         m_TargetAssemblyTypeName: changeImage, MessageSeed
         m_MethodName: ChangeSprite
         m_Mode: 1
@@ -3085,7 +3100,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2140221514}
+      - m_Target: {fileID: 1709432498}
         m_TargetAssemblyTypeName: HideShow, MessageSeed
         m_MethodName: WhenButtonIsClicked
         m_Mode: 1
@@ -3135,6 +3150,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1682179787}
   m_CullTransparentMesh: 1
+--- !u!114 &1682179792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1682179787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 483eab8f7eb2159418f2fb2d81b6931c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonsprite:
+  - {fileID: 21300000, guid: 54271df46d7283b489b75438eb225dba, type: 3}
+  - {fileID: 21300000, guid: cdeb1109232505843aa5b4705a834093, type: 3}
+  targetbutton: {fileID: 1682179790}
+--- !u!114 &1682179793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1682179787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c10108b54d677342a66606922a4f839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 1682179787}
 --- !u!1 &1709432493
 GameObject:
   m_ObjectHideFlags: 0
@@ -3147,6 +3191,8 @@ GameObject:
   - component: {fileID: 1709432497}
   - component: {fileID: 1709432496}
   - component: {fileID: 1709432495}
+  - component: {fileID: 1709432499}
+  - component: {fileID: 1709432498}
   m_Layer: 5
   m_Name: write new message
   m_TagString: Untagged
@@ -3171,7 +3217,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 40.5, y: -101.7}
+  m_AnchoredPosition: {x: 93, y: -38}
   m_SizeDelta: {x: 52.12201, y: 52.123993}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1709432495
@@ -3230,7 +3276,7 @@ MonoBehaviour:
           m_StringArgument: ShowEditor
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 368749570}
+      - m_Target: {fileID: 1709432499}
         m_TargetAssemblyTypeName: changeImage, MessageSeed
         m_MethodName: ChangeSprite
         m_Mode: 1
@@ -3242,7 +3288,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 6812615}
+      - m_Target: {fileID: 1682179793}
         m_TargetAssemblyTypeName: HideShow, MessageSeed
         m_MethodName: WhenButtonIsClicked
         m_Mode: 1
@@ -3292,6 +3338,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1709432493}
   m_CullTransparentMesh: 1
+--- !u!114 &1709432498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1709432493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c10108b54d677342a66606922a4f839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 1709432493}
+--- !u!114 &1709432499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1709432493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 483eab8f7eb2159418f2fb2d81b6931c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonsprite:
+  - {fileID: 21300000, guid: 498f4fa829e4c1c4f8abe889315eb558, type: 3}
+  - {fileID: 21300000, guid: cdeb1109232505843aa5b4705a834093, type: 3}
+  targetbutton: {fileID: 1709432496}
 --- !u!1 &1741592422
 GameObject:
   m_ObjectHideFlags: 0
@@ -3493,26 +3568,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1862670912}
-  - component: {fileID: 1862670911}
   m_Layer: 0
   m_Name: GameObject to save message
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1862670911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1862670910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c7938bafe257804d8dd7bbd421c6e15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_IsActive: 0
 --- !u!4 &1862670912
 Transform:
   m_ObjectHideFlags: 0
@@ -3563,8 +3625,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 7.5, y: 0}
+  m_SizeDelta: {x: -15, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1871100141
 MonoBehaviour:
@@ -3620,7 +3682,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -3698,8 +3760,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 7.5, y: 0}
+  m_SizeDelta: {x: -15, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1893339857
 MonoBehaviour:
@@ -3755,7 +3817,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -4173,8 +4235,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 7.5, y: 0}
+  m_SizeDelta: {x: -15, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2003746782
 MonoBehaviour:
@@ -4230,7 +4292,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -4282,30 +4344,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2088861640}
-  - component: {fileID: 2088861639}
   m_Layer: 0
   m_Name: GameObject for settings panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2088861639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2088861638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 483eab8f7eb2159418f2fb2d81b6931c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buttonsprite:
-  - {fileID: 21300000, guid: 54271df46d7283b489b75438eb225dba, type: 3}
-  - {fileID: 21300000, guid: cdeb1109232505843aa5b4705a834093, type: 3}
-  targetbutton: {fileID: 1682179790}
+  m_IsActive: 0
 --- !u!4 &2088861640
 Transform:
   m_ObjectHideFlags: 0
@@ -4358,8 +4403,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 7.9096, y: -14.1243}
-  m_SizeDelta: {x: -67.8419, y: -134.0469}
+  m_AnchoredPosition: {x: 8.5269, y: -3.8396}
+  m_SizeDelta: {x: -81.4214, y: -93.7254}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2133355417
 MonoBehaviour:
@@ -4396,27 +4441,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2140221515}
-  - component: {fileID: 2140221514}
   m_Layer: 0
   m_Name: GameObject to hide/show writemessage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2140221514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2140221513}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c10108b54d677342a66606922a4f839, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  button: {fileID: 1709432493}
+  m_IsActive: 0
 --- !u!4 &2140221515
 Transform:
   m_ObjectHideFlags: 0
