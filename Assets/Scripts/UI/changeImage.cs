@@ -1,24 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class ChangeImage : MonoBehaviour {
 
+    [SerializeField] private Sprite spriteIcon;
+    [SerializeField] private Sprite spriteClosed;
 
-public class changeImage : MonoBehaviour
-{
-    [SerializeField] private Sprite[] buttonsprite;
-    [SerializeField] private Image targetbutton;
+    [SerializeField] private Image targetButton;
+
+    private bool displayIcon = true;
 
     public void ChangeSprite() {
+        // invert the 'display icon' boolean
+        displayIcon = !displayIcon;
 
-        if(targetbutton.sprite == buttonsprite[0]) {
-
-            targetbutton.sprite = buttonsprite[1];
-            return;
-        }
-
-        targetbutton.sprite = buttonsprite[0];
+        // Change the sprite according to the boolean value
+        targetButton.sprite = displayIcon ? spriteIcon : spriteClosed;
     }
 
 }
