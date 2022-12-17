@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ChangeImage : MonoBehaviour {
+public class ImageToggler : MonoBehaviour {
 
     [SerializeField] private Sprite spriteIcon;
     [SerializeField] private Sprite spriteClosed;
