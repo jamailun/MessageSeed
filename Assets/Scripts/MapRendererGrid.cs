@@ -92,7 +92,14 @@ public class MapRendererGrid : MonoBehaviour {
         // current bounds
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
-	}
+        // center
+        if(PerspectivePan.Instance) {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(PerspectivePan.Instance.CameraBounds.min, PerspectivePan.Instance.CameraBounds.max);
+            Gizmos.DrawLine(new(PerspectivePan.Instance.CameraBounds.min.x, PerspectivePan.Instance.CameraBounds.max.y, PerspectivePan.Instance.CameraBounds.max.z), new(PerspectivePan.Instance.CameraBounds.max.x, PerspectivePan.Instance.CameraBounds.min.y, PerspectivePan.Instance.CameraBounds.max.z));
+            Gizmos.DrawSphere(PerspectivePan.Instance.CameraBounds.center, 0.02f);
+        }
+    }
 
     /// <summary>
     /// Reload the URL fetcher from the serializedField attributes.
@@ -278,6 +285,10 @@ public class MapRendererGrid : MonoBehaviour {
     }
 
     public void ZoomLayerChange(bool zoomIn) {
+        // before everything, we compute the WORLD POSITIOn center of the screen.
+        var unityScreenCenter = PerspectivePan.Instance.CameraBounds.center;
+        var oldWorldScreenCenter = GetWorldPositionFromUnity(unityScreenCenter);
+
         // Hide old layer
         RenderersLayerContainer.gameObject.SetActive(false);
         // Update zoom value.
@@ -293,6 +304,12 @@ public class MapRendererGrid : MonoBehaviour {
         // update grid.
         UpdateGridVisibility();
         _worldDeltas = GetWorldDeltas(); // we update the worlddeltas.
+
+        // then we recompute current screen center
+        unityScreenCenter = PerspectivePan.Instance.CameraBounds.center;
+        var newWorldScreenCenter = GetWorldPositionFromUnity(unityScreenCenter);
+
+        var deltaOldAndNewCenters = (newWorldScreenCenter - oldWorldScreenCenter);  
     }
 
     private Vector2 GetWorldDeltas() {
@@ -328,4 +345,17 @@ public class MapRendererGrid : MonoBehaviour {
 
         return destination;
 	}
+
+    public Vector2 GetWorldPositionFromUnity(Vector2 unityCoordinates) {
+        var center = MapRendererFragment.CENTER;
+        float distanceUnityX = unityCoordinates.x - center.TopLeft.x;
+        float distanceUnityY = unityCoordinates.y - center.TopLeft.y;
+
+        float distanceWorldX = _worldDeltas.x * distanceUnityX * _fragDx * 10f; // ATTENTION
+        float distanceWorldY = _worldDeltas.y * distanceUnityX * _fragDy * 10f; // (1/delta) et  PAS juste delta !!!!!!!!!!!!
+
+        Vector2 originalWorldPosition = center.WorldPosition;
+        Vector2 destination = originalWorldPosition + new Vector2(distanceWorldX, distanceWorldY);
+        return destination;
+    }
 }
