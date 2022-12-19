@@ -1,19 +1,48 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class MessageRenderer : MonoBehaviour {
 
 	private Message _message;
-	private SpriteRenderer _spriteRenderer; //todo
+	private bool IsLoaded => _message != null && _message.IsComplete;
 
-	public bool HasMessage => _message != null;
 	public Message Message => _message;
 
 	public void SetMessage(Message message) {
 		this._message = message;
-		if(message != null)
-			GetComponent<SpriteRenderer>().color = message.MessageColor;
+		UpdateColor();
+	}
+
+	private void UpdateColor() {
+		GetComponent<SpriteRenderer>().color = Message == null ? Color.gray : Message.MessageColor;
+	}
+
+	public void OpenOrLoad(CSharpExtension.Consumable<Message> callback) {
+		if(Message == null) {
+			Debug.LogError("ERRROR tried to load messageRenderer " + name + "... But NO message has been provided.");
+			return;
+		}
+		if(IsLoaded)
+			return;
+		StartCoroutine(CR_GetMessageDetails(callback));
+	}
+
+	private IEnumerator CR_GetMessageDetails(CSharpExtension.Consumable<Message> callback) {
+		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/"+Message.MessageId+"/")) {
+			yield return www.SendWebRequest();
+			if(www.result != UnityWebRequest.Result.Success) {
+				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
+			} else {
+				Debug.Log("success get messages !");
+				Debug.Log(www.downloadHandler.text);
+				var messageComplete = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
+				// apply
+				Message.Complete(messageComplete);
+				UpdateColor();
+			}
+		}
 	}
 
 

@@ -10,6 +10,12 @@ public class AccountManager : MonoBehaviour {
 	[Header("Configuration")]
 	[SerializeField] private string mainSceneName = "MainScene";
 
+	[Header("Debug")]
+	[SerializeField] private string _debugUser;
+	[SerializeField] private string _debugPass;
+	[SerializeField] private bool _debugMode;
+
+
 	public static string Token { get; private set; }
 	private static string TokenRefresh { get; set; }
 	public static Account Account { get; private set; }
@@ -19,7 +25,7 @@ public class AccountManager : MonoBehaviour {
 		return Account != null && id == Account.accountId;
 	}
 
-	private void Start() {
+	private void Awake() {
 		// garantie the singleton
 		if(Instance != null) {
 			Destroy(gameObject);
@@ -28,6 +34,14 @@ public class AccountManager : MonoBehaviour {
 		Instance = this;
 		// Make persistent accross loading
 		DontDestroyOnLoad(gameObject);
+	}
+
+	private void Start() {
+		// DEBUG
+		if(_debugMode) {
+			Debug.LogWarning("DEBUG for AccountManager.");
+			TryLogin(_debugUser, _debugPass);
+		}
 	}
 
 
