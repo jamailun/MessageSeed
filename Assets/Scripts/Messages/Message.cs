@@ -4,6 +4,7 @@ public class Message {
 
 	public MessageHeader header;
 	public bool IsComplete { get; private set; }
+	public string MessageId => header.author_id;
 
 	public string messageTitle;
 	public string messageContent;

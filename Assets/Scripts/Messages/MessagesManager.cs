@@ -26,8 +26,6 @@ public class MessagesManager : MonoBehaviour {
 	private IEnumerator CR_UpdateMessagesRequest(double longitude, double latitude, int zoom, CSharpExtension.Consumable<IEnumerable<Message>> callback) {
 
 		// DEBUG ONLY
-		yield return new WaitForEndOfFrame();
-
 		messages.Add(Message.DebugMessage(1));
 		messages.Add(Message.DebugMessage(2));
 		messages.Add(Message.DebugMessage(3));
@@ -35,7 +33,7 @@ public class MessagesManager : MonoBehaviour {
 		messages[1].RealWorldPosition = GpsPosition.Instance.LastPosition - new Vector2(-0.1f, 0.02f);
 		messages[2].RealWorldPosition = GpsPosition.Instance.LastPosition + new Vector2(0.05f, 0.01f);
 
-		using(var www = RemoteApiManager.Instance.CreateGetRequest("/messages/")) {
+		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
