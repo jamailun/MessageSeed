@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 
@@ -36,13 +35,26 @@ public class MessagesManager : MonoBehaviour {
 		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
-				Debug.LogError(www.error + ". Request feedback: [" + www.downloadHandler?.text+"]");
+				Debug.LogError(www.error + ". URL=["+www.url+"] Request feedback: [" + www.downloadHandler?.text+"]");
 			} else {
-				Debug.Log("success get messages !");
-				Debug.Log(www.downloadHandler.text);
+				string json = www.downloadHandler.text;
+				Debug.Log("success get messages : " + json);
+
+				// Unity CANNOT handle [{}...]. It needs to be wrapped as {list:[{}...]}
+				string jsonWrapped = WrapJsonToClass(json, "list");
+				var headers = JsonUtility.FromJson<MessagesHeaderList>(jsonWrapped);
+
+				foreach(var header in headers.list) {
+					messages.Add(new Message(header));
+				}
+
 				callback?.Invoke(messages);
 			}
 		}
+	}
+
+	private static string WrapJsonToClass(string source, string topClass) {
+		return string.Format("{{ \"{0}\": {1}}}", topClass, source);
 	}
 
 }

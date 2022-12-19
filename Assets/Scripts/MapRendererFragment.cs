@@ -45,20 +45,21 @@ public class MapRendererFragment : MonoBehaviour {
     }
 
 	private IEnumerator LoadSprite(string url, int x, int y, int zoom) {
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
-        yield return www.SendWebRequest();
+        using(UnityWebRequest www = UnityWebRequestTexture.GetTexture(url)) {
+            yield return www.SendWebRequest();
 
-        if(www.result != UnityWebRequest.Result.Success) {
-            Debug.LogError("Could not fetch tecture from [" + url + "] : " + www.error);
-        } else {
-            //Debug.Log("Image successfully fetched from [" + url + "].");
-            Texture2D texture = ((DownloadHandlerTexture) www.downloadHandler).texture;
-            texture.filterMode = FilterMode.Point;
-            _spriteRenderer.sprite = Sprite.Create(texture, new Rect(0, 0, _width, _height), new Vector2(.5f, .5f));
-            // save it in the buffer
-            TilesBuffer.Instance.Put(zoom, x, y, _spriteRenderer.sprite);
+            if(www.result != UnityWebRequest.Result.Success) {
+                Debug.LogError("Could not fetch tecture from [" + url + "] : " + www.error);
+            } else {
+                //Debug.Log("Image successfully fetched from [" + url + "].");
+                Texture2D texture = ((DownloadHandlerTexture) www.downloadHandler).texture;
+                texture.filterMode = FilterMode.Point;
+                _spriteRenderer.sprite = Sprite.Create(texture, new Rect(0, 0, _width, _height), new Vector2(.5f, .5f));
+                // save it in the buffer
+                TilesBuffer.Instance.Put(zoom, x, y, _spriteRenderer.sprite);
+            }
+            IsLoading = false;
         }
-        IsLoading = false;
     }
 
     private bool hasImage = false;
