@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using TMPro;
 
 public class NewMessagePanel : MonoBehaviour {
@@ -7,6 +8,7 @@ public class NewMessagePanel : MonoBehaviour {
 	[SerializeField] private TMP_InputField headerInput;
 	[SerializeField] private TMP_InputField contentInput;
 	[SerializeField] private Button saveButton;
+	[SerializeField] private UnityEvent afterSaveEvent;
 
 	private void Start() {
 		saveButton.interactable = true;
@@ -28,9 +30,20 @@ public class NewMessagePanel : MonoBehaviour {
 		}
 
 		// Accept
-		Debug.Log("New message : (" + header + ") : '" + content + "'.");
-		//TODO create the message (other branch)
-		//TODO hide this windows by calling (indirectly) the #CloseEverything method on MainMenuUI (use a UnityEvent (in namespace UnityEditor.Events))
+		Debug.Log("Sending new message : (" + header + ") : '" + content + "'.");
+		MessagesManager.Instance.WriteMessage(header, content, MessageSendingError, MessageSendingOver);
+	}
+
+	private void MessageSendingError(string error) {
+		// TODO
+	}
+	private void MessageSendingOver() {
+		// clear
+		headerInput.text = "";
+		contentInput.text = "";
+		// close
+		afterSaveEvent?.Invoke();
+		saveButton.interactable = true;
 	}
 
 	/// <summary>
