@@ -13,6 +13,7 @@ public class MapRendererFragment : MonoBehaviour {
     public int IndexI => _i;
     public int IndexJ => _j;
     public Bounds Bounds => _spriteRenderer.bounds;
+    public bool IsLoading { get;  private set; }
 
     // this point is the Unity position for the corresponding worlds coordinates.
     public Vector2 TopLeft => new(Bounds.min.x, Bounds.max.y);
@@ -57,6 +58,7 @@ public class MapRendererFragment : MonoBehaviour {
             // save it in the buffer
             TilesBuffer.Instance.Put(zoom, x, y, _spriteRenderer.sprite);
         }
+        IsLoading = false;
     }
 
     private bool hasImage = false;
@@ -70,8 +72,10 @@ public class MapRendererFragment : MonoBehaviour {
             return;
 
         TextureQuery res = TilesBuffer.Instance.TryGet(zoom, x, y);
+        IsLoading = true;
         if(res.found) {
             _spriteRenderer.sprite = res.texture;
+            IsLoading = false;
         } else {
             string url = fetcher.CreateUrlTile(x, y, zoom);
             StartCoroutine(LoadSprite(url, x, y, zoom));

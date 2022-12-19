@@ -214,7 +214,8 @@ public class MapRendererGrid : MonoBehaviour {
         Bounds camera = PerspectivePan.Instance.CameraBounds;
         // Hide non-visible tiles.
         foreach(var mr in RenderersLayer) {
-            mr.gameObject.SetActive(mr.Bounds.Intersects2D(camera));
+            // we also keep tiles that are loading
+            mr.gameObject.SetActive(mr.IsLoading || mr.Bounds.Intersects2D(camera));
         }
 
         // Recalculate with hidden elements
@@ -308,7 +309,10 @@ public class MapRendererGrid : MonoBehaviour {
         unityScreenCenter = PerspectivePan.Instance.CameraBounds.center;
         var newWorldScreenCenter = GetWorldPositionFromUnity(unityScreenCenter);
 
-        var deltaOldAndNewCenters = (newWorldScreenCenter - oldWorldScreenCenter);  
+        var deltaOldAndNewCenters = (newWorldScreenCenter - oldWorldScreenCenter);
+        Debug.Log("Zoom layer change. oldWorldCenter="+oldWorldScreenCenter+", newWorlCenter="+newWorldScreenCenter);
+        Debug.Log("deltaWorldCenter="+ deltaOldAndNewCenters);
+//        PerspectivePan.Instance.ForceMove(deltaOldAndNewCenters);
     }
 
     private Vector2 GetWorldDeltas() {
@@ -350,8 +354,8 @@ public class MapRendererGrid : MonoBehaviour {
         float distanceUnityX = unityCoordinates.x - center.TopLeft.x;
         float distanceUnityY = unityCoordinates.y - center.TopLeft.y;
 
-        float distanceWorldX = _worldDeltas.x * distanceUnityX * _fragDx * 10f; // ATTENTION
-        float distanceWorldY = _worldDeltas.y * distanceUnityX * _fragDy * 10f; // (1/delta) et  PAS juste delta !!!!!!!!!!!!
+        float distanceWorldX = (1f/_worldDeltas.x) * distanceUnityX * _fragDx * 10f;
+        float distanceWorldY = (1f/_worldDeltas.y) * distanceUnityY * _fragDy * 10f;
 
         Vector2 originalWorldPosition = center.WorldPosition;
         Vector2 destination = originalWorldPosition + new Vector2(distanceWorldX, distanceWorldY);
