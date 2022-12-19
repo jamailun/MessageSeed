@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(SpriteRenderer))]
 public class MapRendererFragment : MonoBehaviour {
 
-    public static MapRendererFragment CENTER { get; private set; }
+    public static MapRendererFragment CENTER { get; set; }
 
     private SpriteRenderer _spriteRenderer;
     private float _width, _height;
@@ -34,7 +34,7 @@ public class MapRendererFragment : MonoBehaviour {
         this._j = j;
         if(!_spriteRenderer)
             Start();
-        if(i == 0 && j == 0) {
+        if(CENTER == null) {
             CENTER = this;
 		}
     }
@@ -85,6 +85,5 @@ public class MapRendererFragment : MonoBehaviour {
         lastY = y;
         lastZoom = zoom;
         lastPosition = MapUtils.GetCoordinates(x, y, zoom);
-        Debug.Log("(" + x + ", " + y + ", " + zoom + ") => " + lastPosition);
     }
 }
