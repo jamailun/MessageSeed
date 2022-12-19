@@ -68,7 +68,7 @@ public class AccountManager : MonoBehaviour {
 		string postData = JsonUtility.ToJson(new LoginRequest(user, password));
 		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
 
-		var url = RemoteApiManager.Instance.GetUrl("/auth/login/");
+		var url = RemoteApiManager.Instance.GetUrl("/api_auth/login/");
 		Debug.Log("Sending '" + postData + "' to " + url);
 
 		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest(url, postDataRaw)) {
