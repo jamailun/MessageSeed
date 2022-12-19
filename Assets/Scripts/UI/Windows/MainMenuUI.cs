@@ -4,6 +4,7 @@ using UnityEngine;
 public class MainMenuUI : MonoBehaviour {
 
 	private State state = State.DEFAULT;
+	private MainMenuWindowUI subPanelOpen;
 
 	private readonly List<MainMenuWindowUI> windows = new();
 
@@ -12,15 +13,33 @@ public class MainMenuUI : MonoBehaviour {
 		windows.AddRange(GetComponentsInChildren<MainMenuWindowUI>());
 	}
 
+	// Called by events
 	public void TriggerOpen(MainMenuWindowUI target) {
 		State newState = (target == null) ? State.DEFAULT : target.TargetState;
 		TriggerHandleOpen(newState, target);
 	}
 
-    public void CloseEverything() {
+	// Called by events
+	public void OpenSubPanel(MainMenuWindowUI panel) {
+		if(subPanelOpen) {
+			subPanelOpen.Close();
+		}
+		subPanelOpen = panel;
+		if(panel)
+			panel.Open();
+	}
+
+	public void CloseEverything() {
 		foreach(var w in windows)
 			w.Close();
 		state = State.DEFAULT;
+	}
+
+	public void CloseSubPanel() {
+		if(subPanelOpen) {
+			subPanelOpen.Close();
+			subPanelOpen = null;
+		}
 	}
 
 	[System.Serializable]
