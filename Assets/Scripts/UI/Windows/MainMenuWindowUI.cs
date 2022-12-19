@@ -6,8 +6,10 @@ public class MainMenuWindowUI : MonoBehaviour {
 
 	private bool open = false;
 
+	[SerializeField] private MainMenuUI.State _state;
 	[SerializeField] private UnityEvent openEvent;
 	[SerializeField] private UnityEvent closeEvent;
+	public MainMenuUI.State TargetState => _state;
 
 	public void Open() {
 		if(open)
