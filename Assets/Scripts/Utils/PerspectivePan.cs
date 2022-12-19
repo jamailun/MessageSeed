@@ -113,6 +113,10 @@ public class PerspectivePan : MonoBehaviour {
         Camera.main.orthographicSize = _zoomInit;
     }
 
+    public void ForceMove(Vector2 vector) {
+        transform.position += new Vector3(vector.x, vector.y, 0);
+	}
+
     public Bounds CameraBounds => new(RawCameraBounds.center, RawCameraBounds.size * cameraBoundsBuffer);
 
     public Bounds RawCameraBounds => Camera.main.OrthographicBounds();

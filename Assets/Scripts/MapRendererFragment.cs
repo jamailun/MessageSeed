@@ -34,7 +34,6 @@ public class MapRendererFragment : MonoBehaviour {
         if(!_spriteRenderer)
             Start();
         if(i == 0 && j == 0) {
-            Debug.LogWarning("NEW center : " + this);
             CENTER = this;
 		}
     }

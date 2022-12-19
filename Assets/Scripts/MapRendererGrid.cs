@@ -293,7 +293,6 @@ public class MapRendererGrid : MonoBehaviour {
         RenderersLayerContainer.gameObject.SetActive(false);
         // Update zoom value.
         _zoom += (zoomIn ? 1 : -1);
-        Debug.LogWarning("zoom changed. new zoom = " + _zoom);
         // Get new layer and show it
         RenderersLayerContainer.gameObject.SetActive(true);
         // If empty, create a first elem
