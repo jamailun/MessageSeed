@@ -1,52 +1,60 @@
 ﻿using UnityEngine;
 
-/// <summary>
-/// Serialized from JSON.
-/// </summary>
-[System.Serializable]
 public class Message {
 
-	public long messageId; // Comme discord, le timestamp == le message id
+	public MessageHeader header;
+	public bool IsComplete { get; private set; }
 
 	public string messageTitle;
-
 	public string messageContent;
 
 	public string authorName;
 
-	public string authorId;
-
 	public long deathTime; // timecode of the death
-
 	public long likesAmount;
 
-	public float longitude, latitude;
+	public Color MessageColor => AccountManager.IsMe(header.author_id) ? Color.yellow : Color.blue;
 
-	public Color MessageColor => AccountManager.IsMe(authorId) ? Color.yellow : Color.blue;
+	// DEBUG constructor
+	private Message(string id, string author, string t, string c) {
+		this.header = new() { message_id = id, author_id = author };
+		authorName = author;
+		messageTitle = t;
+		messageContent = c;
+		IsComplete = true;
+	}
 
-	public Message() { /* JSON constructor */ }
+	public Message(MessageHeader header) {
+		this.header = header;
+		IsComplete = false;
+	}
 
-	public Message(Account author, string title, string content) {
-		messageTitle = title;
-		messageContent = content;
-		authorName = author.username;
-		authorId = author.accountId;
+	public void Complete(MessageComplete message) {
+		if(IsComplete) {
+			Debug.LogError("Tried to complete message " + this + " with " + message + ", but it was already completed !");
+			return;
+		}
+		authorName = message.author_name;
+		messageTitle = message.title;
+		messageContent = message.content;
+		likesAmount = message.likesAmount;
+		IsComplete = true;
 	}
 
 	public Vector2 RealWorldPosition {
-		set { longitude = value.x; latitude = value.y; }
-		get { return new(longitude, latitude); }
+		set { header.longitude = value.x; header.latitude = value.y; }
+		get { return new(header.longitude, header.latitude); }
 	}
 
-	public bool ExistsOnServer => messageId != 0;
+	public bool ExistsOnServer => header.message_id != null;
 
 	public const float EARTH_RADIUS_KM = 6371f;
 	// Code adapted from https://www.geeksforgeeks.org/program-distance-two-points-earth/
 	public float GetDistanceRealWorld(Vector2 realWorldPosition) {
 		float lon1 = realWorldPosition.x * Mathf.Deg2Rad;
-		float lon2 = longitude * Mathf.Deg2Rad;
+		float lon2 = header.longitude * Mathf.Deg2Rad;
 		float lat1 = realWorldPosition.y * Mathf.Deg2Rad;
-		float lat2 = latitude * Mathf.Deg2Rad;
+		float lat2 = header.latitude * Mathf.Deg2Rad;
 
 		// Haversine formula
 		float dlon = lon2 - lon1;
@@ -58,7 +66,22 @@ public class Message {
 	}
 
 	public static Message DebugMessage(int i) {
-		return new Message(new Account("test_" + i, "test_" + i), "TEST_" + i, "Message de test n°" + i + ".");
+		return new Message("test_" + i, "AUTHOR_TEST", "TEST_" + i, "Message de test n°" + i + ".");
 	}
-
 }
+
+[System.Serializable]
+public struct MessageHeader {
+	public string message_id;
+	public string author_id;
+	public float latitude, longitude;
+}
+
+[System.Serializable]
+public struct MessageComplete {
+	public string title;
+	public string content;
+	public string author_name;
+	public int likesAmount;
+}
+

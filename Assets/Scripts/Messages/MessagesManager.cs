@@ -32,30 +32,19 @@ public class MessagesManager : MonoBehaviour {
 		messages.Add(Message.DebugMessage(2));
 		messages.Add(Message.DebugMessage(3));
 		messages[0].RealWorldPosition = GpsPosition.Instance.LastPosition + new Vector2(0.02f, 0.02f);
-		messages[1].RealWorldPosition = GpsPosition.Instance.LastPosition - new Vector2(0.02f, 0.02f);
+		messages[1].RealWorldPosition = GpsPosition.Instance.LastPosition - new Vector2(-0.1f, 0.02f);
 		messages[2].RealWorldPosition = GpsPosition.Instance.LastPosition + new Vector2(0.05f, 0.01f);
 
-		/*using(var www = RemoteApiManager.Instance.CreateGetRequest("/messages/")) {
+		using(var www = RemoteApiManager.Instance.CreateGetRequest("/messages/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
 			} else {
-				Debug.Log("success get tiles !");
+				Debug.Log("success get messages !");
+				Debug.Log(www.downloadHandler.text);
+				callback?.Invoke(messages);
 			}
-		}*/
-
-		callback?.Invoke(messages);
-	}
-
-	public Message CreateNewMessage(string title, string content, int fertilizerAmount) {
-		// Send request
-		var msg = new Message(AccountManager.Account, title, content) {
-			RealWorldPosition = GpsPosition.Instance.LastPosition
-		};
-		// fertilizerAmount ??
-
-
-		return msg;
+		}
 	}
 
 }
