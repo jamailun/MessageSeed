@@ -34,7 +34,9 @@ public class AccountManager : MonoBehaviour {
 		Instance = this;
 		// Make persistent accross loading
 		DontDestroyOnLoad(gameObject);
+	}
 
+	private void Start() {
 		// DEBUG
 		if(_debugMode) {
 			Debug.LogWarning("DEBUG for AccountManager.");

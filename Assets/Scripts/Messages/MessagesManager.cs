@@ -36,7 +36,7 @@ public class MessagesManager : MonoBehaviour {
 		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
-				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
+				Debug.LogError(www.error + ". Request feedback: [" + www.downloadHandler?.text+"]");
 			} else {
 				Debug.Log("success get messages !");
 				Debug.Log(www.downloadHandler.text);
