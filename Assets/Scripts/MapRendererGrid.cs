@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class MapRendererGrid : MonoBehaviour {
 
-    [Header("Config")]
+	#region Configuration
+
+	[Header("Config")]
     [SerializeField] private UrlProvider _provider;
     [SerializeField] private string _providerToken;
     [SerializeField] private Sprite _defaultSprite;
@@ -21,7 +23,11 @@ public class MapRendererGrid : MonoBehaviour {
     [SerializeField] private double _latitude;
     [SerializeField] private double _longitude;
 
-    public int Zoom => _zoom;
+	#endregion
+
+	#region Specific access
+
+	public int Zoom => _zoom;
     // URL fetcher
     private UrlFetcher _fetcher;
     // Layers of renderer
@@ -52,12 +58,30 @@ public class MapRendererGrid : MonoBehaviour {
     // Visible messages
     private readonly List<Message> visibleMessages = new();
 
-    private void Start() {
+	#endregion
+
+	private void Start() {
         _fragDx = _fragmentSize.x / 100f;
         _fragDy = _fragmentSize.y / 100f;
 
         ReloadUrlFetcher();
         ResetChildren();
+    }
+
+    private void OnDrawGizmos() {
+        //positions
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(_unityPosition, 0.1f);
+        // current bounds
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
+        // center
+        if(PerspectivePan.Instance) {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(PerspectivePan.Instance.CameraBounds.min, PerspectivePan.Instance.CameraBounds.max);
+            Gizmos.DrawLine(new(PerspectivePan.Instance.CameraBounds.min.x, PerspectivePan.Instance.CameraBounds.max.y, PerspectivePan.Instance.CameraBounds.max.z), new(PerspectivePan.Instance.CameraBounds.max.x, PerspectivePan.Instance.CameraBounds.min.y, PerspectivePan.Instance.CameraBounds.max.z));
+            Gizmos.DrawSphere(PerspectivePan.Instance.CameraBounds.center, 0.02f);
+        }
     }
 
     /// <summary>
@@ -68,6 +92,20 @@ public class MapRendererGrid : MonoBehaviour {
         _longitude = position.x;
         _latitude = position.y;
     }
+
+    /// <summary>
+    /// Reload the URL fetcher from the serializedField attributes.
+    /// </summary>
+    public void ReloadUrlFetcher() {
+        _fetcher = _provider switch {
+            UrlProvider.GoogleApi => new GoogleMapUrlFetcher(_providerToken, (uint) _fragmentSize.x, (uint) _fragmentSize.y),
+            UrlProvider.OpenStreetTiles => new OpenStreetMapURL(),
+            UrlProvider.GeoApiFy => new GeoApiFyUrlFetcher(_providerToken),
+            _ => throw new System.Exception("Unknown provider : " + _provider + ".")
+        };
+    }
+
+    #region Messages management
 
     public void UpdateMessages(IEnumerable<Message> messages) {
         //XXX To improve. For now, just replace the list.
@@ -85,38 +123,14 @@ public class MapRendererGrid : MonoBehaviour {
         Debug.LogWarning("new message : " + renderer + ", at " + renderer.transform.position);
 	}
 
-	private void OnDrawGizmos() {
-        //positions
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(_unityPosition, 0.1f);
-        // current bounds
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(CurrentBounds.center, CurrentBounds.size);
-        // center
-        if(PerspectivePan.Instance) {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(PerspectivePan.Instance.CameraBounds.min, PerspectivePan.Instance.CameraBounds.max);
-            Gizmos.DrawLine(new(PerspectivePan.Instance.CameraBounds.min.x, PerspectivePan.Instance.CameraBounds.max.y, PerspectivePan.Instance.CameraBounds.max.z), new(PerspectivePan.Instance.CameraBounds.max.x, PerspectivePan.Instance.CameraBounds.min.y, PerspectivePan.Instance.CameraBounds.max.z));
-            Gizmos.DrawSphere(PerspectivePan.Instance.CameraBounds.center, 0.02f);
-        }
-    }
+	#endregion
 
-    /// <summary>
-    /// Reload the URL fetcher from the serializedField attributes.
-    /// </summary>
-	public void ReloadUrlFetcher() {
-        _fetcher = _provider switch {
-            UrlProvider.GoogleApi => new GoogleMapUrlFetcher(_providerToken, (uint) _fragmentSize.x, (uint) _fragmentSize.y),
-            UrlProvider.OpenStreetTiles => new OpenStreetMapURL(),
-            UrlProvider.GeoApiFy => new GeoApiFyUrlFetcher(_providerToken),
-            _ => throw new System.Exception("Unknown provider : " + _provider + ".")
-        };
-    }
+	#region Global bounds and grid management
 
-    /// <summary>
-    /// Reset all grid fragments. Remove old ones, and recreate them all.
-    /// </summary>
-    public void ResetChildren() {
+	/// <summary>
+	/// Reset all grid fragments. Remove old ones, and recreate them all.
+	/// </summary>
+	public void ResetChildren() {
         // Remove immediate all children
         var tempList = transform.Cast<Transform>().ToList();
         foreach(var child in tempList) {
@@ -173,28 +187,6 @@ public class MapRendererGrid : MonoBehaviour {
     }
 
     /// <summary>
-    /// Create a new grid fragment.
-    /// </summary>
-    /// <param name="i">The horizontal unique index.</param>
-    /// <param name="j">The vertical unique index.</param>
-    private void CreateMapElement(int i, int j) {
-        // we want to be sure to not recretate an already-existing tile.
-        MapRendererFragment f = RenderersLayer.Find(m => m.IndexI == i && m.IndexJ == j);
-        if(f) {
-            f.gameObject.SetActive(true);
-            return;
-        }
-        // Create the fragment.
-        GameObject go = new("map_" + i + "_" + j);
-        var mapPart = go.GetOrAddComponent<MapRendererFragment>();
-        mapPart.Init(_fragmentSize.x, _fragmentSize.y, i, j);
-        go.transform.SetParent(RenderersLayerContainer);
-        go.transform.localPosition = new(i * _fragDx, j * _fragDy, 0);
-        go.GetOrAddComponent<SpriteRenderer>().sprite = _defaultSprite;
-        RenderersLayer.Add(mapPart);
-    }
-
-    /// <summary>
     /// Update the image of all the visibles fragments.
     /// </summary>
     public void UpdateMap() {
@@ -214,7 +206,8 @@ public class MapRendererGrid : MonoBehaviour {
         Bounds camera = PerspectivePan.Instance.CameraBounds;
         // Hide non-visible tiles.
         foreach(var mr in RenderersLayer) {
-            mr.gameObject.SetActive(mr.Bounds.Intersects2D(camera));
+            // we also keep tiles that are loading
+            mr.gameObject.SetActive(mr.IsLoading || mr.Bounds.Intersects2D(camera));
         }
 
         // Recalculate with hidden elements
@@ -257,7 +250,11 @@ public class MapRendererGrid : MonoBehaviour {
         UpdateMap();
     }
 
-    private List<MapRendererFragment> AddMapElementsColumn(int x, int yMin, int yMax) {
+	#endregion
+
+	#region Map fragment addition
+
+	private List<MapRendererFragment> AddMapElementsColumn(int x, int yMin, int yMax) {
         for(int y = yMin; y <= yMax; y++) {
             CreateMapElement(x, y);
         }
@@ -269,7 +266,34 @@ public class MapRendererGrid : MonoBehaviour {
         }
         return RecalculateBounds();
     }
-    private class FragmentsLayer {
+
+    /// <summary>
+    /// Create a new grid fragment.
+    /// </summary>
+    /// <param name="i">The horizontal unique index.</param>
+    /// <param name="j">The vertical unique index.</param>
+    private void CreateMapElement(int i, int j) {
+        // we want to be sure to not recretate an already-existing tile.
+        MapRendererFragment f = RenderersLayer.Find(m => m.IndexI == i && m.IndexJ == j);
+        if(f) {
+            f.gameObject.SetActive(true);
+            return;
+        }
+        // Create the fragment.
+        GameObject go = new("map_" + i + "_" + j);
+        var mapPart = go.GetOrAddComponent<MapRendererFragment>();
+        mapPart.Init(_fragmentSize.x, _fragmentSize.y, i, j);
+        go.transform.SetParent(RenderersLayerContainer);
+        go.transform.localPosition = new(i * _fragDx, j * _fragDy, 0);
+        go.GetOrAddComponent<SpriteRenderer>().sprite = _defaultSprite;
+        RenderersLayer.Add(mapPart);
+    }
+
+	#endregion
+
+	#region Layers management
+
+	private class FragmentsLayer {
         public readonly List<MapRendererFragment> list = new();
         public readonly Transform container;
         public FragmentsLayer(Transform container) {
@@ -293,13 +317,25 @@ public class MapRendererGrid : MonoBehaviour {
         RenderersLayerContainer.gameObject.SetActive(false);
         // Update zoom value.
         _zoom += (zoomIn ? 1 : -1);
-        Debug.LogWarning("zoom changed. new zoom = " + _zoom);
         // Get new layer and show it
         RenderersLayerContainer.gameObject.SetActive(true);
+        // Update center
+        MapRendererFragment.CENTER = null; // reset center.
+        var cameraBounds = PerspectivePan.Instance.RawCameraBounds;
+        int ix = (int) (cameraBounds.center.x / _fragDx);
+        int iy = (int) (cameraBounds.center.y / _fragDy);
+
         // If empty, create a first elem
         if(RenderersLayerContainer.childCount == 0) {
-            var cameraBounds = PerspectivePan.Instance.RawCameraBounds;
-            CreateMapElement((int) (cameraBounds.center.y / _fragDy), (int) (cameraBounds.center.x / _fragDy));
+            // no child ? the CENTER will be the first created.
+            CreateMapElement(ix, iy);
+        } else {
+            // Already child. If we found one at the center of the screen, we use it. if not, we get the first created (order is preserved, so first one previously created).
+            var c = RenderersLayer.Find(m => m.IndexI == ix && m.IndexJ == iy);
+            if(c)
+                MapRendererFragment.CENTER = c;
+            else
+                MapRendererFragment.CENTER = RenderersLayerContainer.GetChild(0).GetComponent<MapRendererFragment>();
         }
         // update grid.
         UpdateGridVisibility();
@@ -309,39 +345,58 @@ public class MapRendererGrid : MonoBehaviour {
         unityScreenCenter = PerspectivePan.Instance.CameraBounds.center;
         var newWorldScreenCenter = GetWorldPositionFromUnity(unityScreenCenter);
 
-        var deltaOldAndNewCenters = (newWorldScreenCenter - oldWorldScreenCenter);  
+        var deltaOldAndNewCenters = (newWorldScreenCenter - oldWorldScreenCenter);
+        Debug.Log("Zoom layer change. oldWorldCenter="+oldWorldScreenCenter+", newWorlCenter="+newWorldScreenCenter);
+        Debug.Log("deltaWorldCenter="+ deltaOldAndNewCenters);
+        PerspectivePan.Instance.ForceMove(deltaOldAndNewCenters);
     }
 
-    private Vector2 GetWorldDeltas() {
+    #endregion
+
+    #region World and Unity coordinates
+
+    private int lZ = -1;
+	private Vector2 GetWorldDeltas() {
+        if(lZ == Zoom)
+            return _worldDeltas;
+        lZ = Zoom;
         // a priori, j'aurais au moins le (0,0), le (1,0) et le (0,1).
         var t00 = MapRendererFragment.CENTER;
-        var t10 = RenderersLayer.Find(m => m.IndexI == 1 && m.IndexJ == 0);
-        var t01 = RenderersLayer.Find(m => m.IndexI == 0 && m.IndexJ == 1);
+        var t10 = RenderersLayer.Find(m => m.IndexI == t00.IndexI + 1 && m.IndexJ == t00.IndexJ);
+        var t01 = RenderersLayer.Find(m => m.IndexI == t00.IndexI && m.IndexJ == t00.IndexJ + 1);
         if(!(t00 && t10 && t01)) {
-            Debug.LogWarning("[GetUnityPositionFromWorld] Could NOT get all elements (" + t00 + ", " + t10 + "," + t01 + ")");
+            string s = "[";
+            int n = 0;
+            foreach(var t in RenderersLayerContainer.GetComponentsInChildren<MapRendererFragment>()) {
+                if(n++>0)
+                    s += ", ";
+                s += "(" + t.IndexI + "," + t.IndexJ + ")";
+            }
+            Debug.LogWarning("[GetWorldDeltas] Could NOT get all elements [MISSING==" + (t00 ? "" : "(00), ") + (t01 ? "" : "(01), ") + (t10 ? "" : "(10)") + "].\n" +
+            "List of current tiles :" + s + "]");
             return new();
         }
-        Debug.Log("test des tiles. t00=" + t00.name + t00.WorldPosition+ ", t01=" + t01.name+t01.WorldPosition + ", t10=" + t10.name+t10.WorldPosition);
+        //Debug.Log("test des tiles. t00=" + t00.name + t00.WorldPosition+ ", t01=" + t01.name+t01.WorldPosition + ", t10=" + t10.name+t10.WorldPosition);
         float worldTileDx = t10.WorldPosition.x - t00.WorldPosition.x;
         float worldTileDy = t01.WorldPosition.y - t00.WorldPosition.y;
-        Debug.Log("World D=(" + worldTileDx + ", " + worldTileDy + ").");
+        Debug.Log("World Delta=(" + worldTileDx + ", " + worldTileDy + ").");
         return new(worldTileDx, worldTileDy);
     }
 
     public Vector2 GetUnityPositionFromWorld(Vector2 worldCoordinates) {
         var center = MapRendererFragment.CENTER;
-        Debug.Log("------------------------------------------------");
+        //Debug.Log("------------------------------------------------");
 
         float distanceWorldX = worldCoordinates.x - center.WorldPosition.x;
         float distanceWorldY = worldCoordinates.y - center.WorldPosition.y;
-        Debug.Log("worldCoos = " + worldCoordinates + ". centerTileWorldCoos="+center.WorldPosition+", distancesInWorld = (" + distanceWorldX + ", " + distanceWorldY + ").");
+        //Debug.Log("worldCoos = " + worldCoordinates + ". centerTileWorldCoos="+center.WorldPosition+", distancesInWorld = (" + distanceWorldX + ", " + distanceWorldY + ").");
 
         float distanceUnityX = _worldDeltas.x * distanceWorldX * _fragDx * 10f;
         float distanceUnityY = _worldDeltas.y * distanceWorldY * _fragDy * 10f;
 
         Vector2 originalUnityPosition = center.TopLeft;
         Vector2 destination = originalUnityPosition + new Vector2(distanceUnityX, distanceUnityY);
-        Debug.Log("distancesInUnity = (" + distanceUnityX + ", " + distanceUnityY + "). destination = " + destination);
+        //Debug.Log("distancesInUnity = (" + distanceUnityX + ", " + distanceUnityY + "). destination = " + destination);
 
         return destination;
 	}
@@ -351,11 +406,13 @@ public class MapRendererGrid : MonoBehaviour {
         float distanceUnityX = unityCoordinates.x - center.TopLeft.x;
         float distanceUnityY = unityCoordinates.y - center.TopLeft.y;
 
-        float distanceWorldX = _worldDeltas.x * distanceUnityX * _fragDx * 10f; // ATTENTION
-        float distanceWorldY = _worldDeltas.y * distanceUnityX * _fragDy * 10f; // (1/delta) et  PAS juste delta !!!!!!!!!!!!
+        float distanceWorldX = _worldDeltas.x * distanceUnityX * _fragDx * 10f;
+        float distanceWorldY = _worldDeltas.y * distanceUnityY * _fragDy * 10f;
 
         Vector2 originalWorldPosition = center.WorldPosition;
         Vector2 destination = originalWorldPosition + new Vector2(distanceWorldX, distanceWorldY);
         return destination;
     }
+
+	#endregion
 }

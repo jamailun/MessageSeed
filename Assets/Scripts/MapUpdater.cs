@@ -38,12 +38,11 @@ public class MapUpdater : MonoBehaviour {
 
 	private void UserZoomed(float z) {
 		// nouvelle valeur du zoom en int ??
-		Debug.Log("user zoomed = " + z);
-		if(z <= PerspectivePan.Instance.ZoomMinThreshold) {
+		if(z <= PerspectivePan.Instance.ZoomMinThreshold && _mapRenderer.Zoom < 19) {
 			//Zoom in !
 			_mapRenderer.ZoomLayerChange(true);
 			PerspectivePan.Instance.ResetZoom();
-		} else if(z >= PerspectivePan.Instance.ZoomMaxThreshold) {
+		} else if(z >= PerspectivePan.Instance.ZoomMaxThreshold && _mapRenderer.Zoom > 10) {
 			//Zoom out !
 			_mapRenderer.ZoomLayerChange(false);
 			PerspectivePan.Instance.ResetZoom();

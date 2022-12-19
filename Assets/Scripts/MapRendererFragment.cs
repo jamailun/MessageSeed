@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(SpriteRenderer))]
 public class MapRendererFragment : MonoBehaviour {
 
-    public static MapRendererFragment CENTER { get; private set; }
+    public static MapRendererFragment CENTER { get; set; }
 
     private SpriteRenderer _spriteRenderer;
     private float _width, _height;
@@ -13,6 +13,7 @@ public class MapRendererFragment : MonoBehaviour {
     public int IndexI => _i;
     public int IndexJ => _j;
     public Bounds Bounds => _spriteRenderer.bounds;
+    public bool IsLoading { get;  private set; }
 
     // this point is the Unity position for the corresponding worlds coordinates.
     public Vector2 TopLeft => new(Bounds.min.x, Bounds.max.y);
@@ -33,8 +34,7 @@ public class MapRendererFragment : MonoBehaviour {
         this._j = j;
         if(!_spriteRenderer)
             Start();
-        if(i == 0 && j == 0) {
-            Debug.LogWarning("NEW center : " + this);
+        if(CENTER == null) {
             CENTER = this;
 		}
     }
@@ -58,6 +58,7 @@ public class MapRendererFragment : MonoBehaviour {
             // save it in the buffer
             TilesBuffer.Instance.Put(zoom, x, y, _spriteRenderer.sprite);
         }
+        IsLoading = false;
     }
 
     private bool hasImage = false;
@@ -71,8 +72,10 @@ public class MapRendererFragment : MonoBehaviour {
             return;
 
         TextureQuery res = TilesBuffer.Instance.TryGet(zoom, x, y);
+        IsLoading = true;
         if(res.found) {
             _spriteRenderer.sprite = res.texture;
+            IsLoading = false;
         } else {
             string url = fetcher.CreateUrlTile(x, y, zoom);
             StartCoroutine(LoadSprite(url, x, y, zoom));
@@ -82,6 +85,5 @@ public class MapRendererFragment : MonoBehaviour {
         lastY = y;
         lastZoom = zoom;
         lastPosition = MapUtils.GetCoordinates(x, y, zoom);
-        Debug.Log("(" + x + ", " + y + ", " + zoom + ") => " + lastPosition);
     }
 }

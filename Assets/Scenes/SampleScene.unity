@@ -220,7 +220,7 @@ MonoBehaviour:
   _amountX: 3
   _amountY: 3
   _fragmentSize: {x: 256, y: 256}
-  _zoom: 10
+  _zoom: 13
   _latitude: 39.299236
   _longitude: -76.609383
   _unityPosition: {x: 0, y: 0, z: 0}
