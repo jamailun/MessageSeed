@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public static class CSharpExtension {
 
@@ -67,6 +68,14 @@ public static class CSharpExtension {
 		bool notIntersectX = that.max.x < bounds.min.x || that.min.x > bounds.max.x;
 		bool notIntersectY = that.max.y < bounds.min.y || that.min.y > bounds.max.y;
 		return !(notIntersectX || notIntersectY);
+	}
+
+	public static void DoLater(this MonoBehaviour obj, float time, Runnable runnable) {
+		obj.StartCoroutine(CR_Runnable(time, runnable));
+	}
+	public static IEnumerator CR_Runnable(float time, Runnable runnable) {
+		yield return new WaitForSeconds(time);
+		runnable?.Invoke();
 	}
 
 }	

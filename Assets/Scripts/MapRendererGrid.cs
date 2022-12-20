@@ -119,8 +119,8 @@ public class MapRendererGrid : MonoBehaviour {
     private void CreateMessageRenderer(Message message) {
         var renderer = Instantiate(_messageRendererPrefab);
         renderer.SetMessage(message);
-        renderer.transform.position = GetUnityPositionFromWorld(message.RealWorldPosition);
-        Debug.LogWarning("new message : " + renderer + ", at " + renderer.transform.position);
+        var pos2d = GetUnityPositionFromWorld(message.RealWorldPosition);
+        renderer.transform.position = new(pos2d.x, pos2d.y, -1f);
 	}
 
 	#endregion

@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using System.Linq;
+using System.Collections.Generic;
 
 public class Message {
 
 	public MessageHeader header;
 	public bool IsComplete { get; private set; }
-	public string MessageId => header.author_id;
+	public string MessageId => header.AuthorId;
 
 	public string messageTitle;
 	public string messageContent;
@@ -14,11 +16,11 @@ public class Message {
 	public long deathTime; // timecode of the death
 	public long likesAmount;
 
-	public Color MessageColor => AccountManager.IsMe(header.author_id) ? Color.yellow : Color.blue;
+	public Color MessageColor => AccountManager.IsMe(header.AuthorId) ? Color.yellow : Color.blue;
 
 	// DEBUG constructor
 	private Message(string id, string author, string t, string c) {
-		this.header = new() { message_id = id, author_id = author };
+		this.header = new() { id = id, author = author };
 		authorName = author;
 		messageTitle = t;
 		messageContent = c;
@@ -47,7 +49,7 @@ public class Message {
 		get { return new(header.longitude, header.latitude); }
 	}
 
-	public bool ExistsOnServer => header.message_id != null;
+	public bool ExistsOnServer => header.id != null;
 
 	public const float EARTH_RADIUS_KM = 6371f;
 	// Code adapted from https://www.geeksforgeeks.org/program-distance-two-points-earth/
@@ -73,9 +75,24 @@ public class Message {
 
 [System.Serializable]
 public struct MessageHeader {
-	public string message_id;
-	public string author_id;
+	public string id;
+	public string author;
 	public float latitude, longitude;
+
+	public string AuthorId {
+		get {
+			if(author == null || !author.Contains("/"))
+				return author;
+			var t = author.Split("/");
+			if(t.Length < 2)
+				return author;
+			return t[^2];
+		}
+	}
+
+	public override string ToString() {
+		return "MessageHeader{id=" + id + ", author_id=" + AuthorId + ", lat=" + latitude + ", long=" + longitude + "}";
+	}
 }
 
 [System.Serializable]
@@ -84,5 +101,10 @@ public struct MessageComplete {
 	public string content;
 	public string author_name;
 	public int likesAmount;
+}
+
+[System.Serializable]
+public struct MessagesHeaderList {
+	public MessageHeader[] list;
 }
 

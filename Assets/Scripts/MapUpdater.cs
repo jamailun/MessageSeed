@@ -11,7 +11,7 @@ public class MapUpdater : MonoBehaviour {
 		PerspectivePan.Instance.moveEvent += UserMoved;
 		PerspectivePan.Instance.zoomEvent += UserZoomed;
 		// on startup, init renderers
-		PostModification();
+		this.DoLater(0.5f, () => PostModification());
 	}
 
 	private void OnDisable() {

@@ -17,15 +17,17 @@ public class RemoteApiManager : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 	}
 
-	public UnityWebRequest CreatePostRequest(string url, byte[] param) {
-		var www = UnityWebRequest.Put(url, param); // create as a Put, but...
+	public UnityWebRequest CreatePostRequest(string url, byte[] param, bool auth = false) {
+		var www = UnityWebRequest.Put(GetUrl(url), param); // create as a Put, but...
 		www.method = "POST"; //... set to POST. This is a workaround to easily pass bytes to a POST.
 		www.SetRequestHeader("Content-Type", "application/json");
+		if(auth)
+			return AuthenticateRequest(www);
 		return www;
 	}
 
 	public UnityWebRequest CreateAuthGetRequest(string url) {
-		return AuthenticateRequest(UnityWebRequest.Get(url));
+		return AuthenticateRequest(UnityWebRequest.Get(GetUrl(url)));
 	}
 
 	public UnityWebRequest AuthenticateRequest(UnityWebRequest request) {
@@ -33,7 +35,7 @@ public class RemoteApiManager : MonoBehaviour {
 			Debug.LogError("Could not authenticate request. AccountManager is NOT logged-in.");
 			return request;
 		}
-		request.SetRequestHeader("Authorization", AccountManager.Token);
+		request.SetRequestHeader("Authorization", "Bearer " + AccountManager.Token);
 		return request;
 	}
 

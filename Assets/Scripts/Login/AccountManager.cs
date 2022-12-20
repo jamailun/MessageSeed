@@ -50,7 +50,6 @@ public class AccountManager : MonoBehaviour {
 			Debug.LogWarning("Tried to log-in... But you're already logged-in !");
 			return;
 		}
-		Debug.Log("Sending request...");
 		StartCoroutine(CR_SendLogin(username, password, errorCallback, successCallback));
 	}
 
@@ -68,10 +67,7 @@ public class AccountManager : MonoBehaviour {
 		string postData = JsonUtility.ToJson(new LoginRequest(user, password));
 		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
 
-		var url = RemoteApiManager.Instance.GetUrl("/auth/login/");
-		Debug.Log("Sending '" + postData + "' to " + url);
-
-		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest(url, postDataRaw)) {
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest("/api_auth/login/", postDataRaw)) {
 			yield return www.SendWebRequest();
 
 			if(www.result != UnityWebRequest.Result.Success) {
