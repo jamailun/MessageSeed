@@ -66,6 +66,7 @@ public class MainMenuUI : MonoBehaviour {
 			window.Open();
 			state = newState;
 		}
+		//TODO close subpanel here
 	}
 
 }
