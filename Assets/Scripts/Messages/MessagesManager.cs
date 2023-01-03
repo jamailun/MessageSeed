@@ -7,6 +7,8 @@ public class MessagesManager : MonoBehaviour {
 
 	public static MessagesManager Instance { get; private set; }
 
+	[SerializeField] private NewMessagesEvent newMessagesEvent;
+
 	private readonly List<Message> messages = new();
 
 	private void Awake() {
@@ -19,13 +21,13 @@ public class MessagesManager : MonoBehaviour {
 	}
 
 	private CSharpExtension.Consumable<IEnumerable<Message>> callback;
-	public void UpdateMessages(double longitude, double latitude, int zoom, CSharpExtension.Consumable<IEnumerable<Message>> callback = null) {
+	public void UpdateMessages(CSharpExtension.Consumable<IEnumerable<Message>> callback = null) {
 		if(callback != null)
 			this.callback = callback;
-		StartCoroutine(CR_UpdateMessagesRequest(longitude, latitude, zoom));
+		StartCoroutine(CR_UpdateMessagesRequest());
 	}
 
-	private IEnumerator CR_UpdateMessagesRequest(double longitude, double latitude, int zoom) {
+	private IEnumerator CR_UpdateMessagesRequest() {
 		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
@@ -43,6 +45,7 @@ public class MessagesManager : MonoBehaviour {
 				}
 
 				callback?.Invoke(messages);
+				newMessagesEvent?.Invoke(messages);
 			}
 		}
 	}
@@ -91,5 +94,9 @@ public class MessagesManager : MonoBehaviour {
 			this.latitude = GpsPosition.Instance.LastPosition.y;
 		}
 	}
+
+
+	[System.Serializable]
+	public class NewMessagesEvent : UnityEngine.Events.UnityEvent<List<Message>> { }
 
 }

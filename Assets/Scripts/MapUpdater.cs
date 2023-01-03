@@ -27,7 +27,7 @@ public class MapUpdater : MonoBehaviour {
 			Debug.Log("Update (" + _lastUpdate + ") : [" + GpsPosition.Instance.LastPosition.x + "; " + GpsPosition.Instance.LastPosition.y + "]");
 			_mapRenderer.SetPosition(position);
 			_mapRenderer.UpdateMap();
-			MessagesManager.Instance.UpdateMessages(position.x, position.y, _mapRenderer.Zoom, _mapRenderer.UpdateMessages);
+			MessagesManager.Instance.UpdateMessages(_mapRenderer.UpdateMessages);
 		}
 	}
 

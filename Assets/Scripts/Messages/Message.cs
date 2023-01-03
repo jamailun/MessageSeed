@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-using System.Linq;
-using System.Collections.Generic;
+using GoShared;
 
 public class Message {
 
@@ -15,6 +14,8 @@ public class Message {
 
 	public long deathTime; // timecode of the death
 	public long likesAmount;
+
+	public GoShared.Coordinates Coordinates => header.Coordinates;
 
 	public Color MessageColor => AccountManager.IsMe(header.AuthorId) ? Color.yellow : Color.blue;
 
@@ -78,6 +79,8 @@ public struct MessageHeader {
 	public string id;
 	public string author;
 	public float latitude, longitude;
+
+	public Coordinates Coordinates => new(latitude, longitude);
 
 	public string AuthorId {
 		get {

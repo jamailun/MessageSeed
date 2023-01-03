@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(SpriteRenderer))]
 public class MessageRenderer : MonoBehaviour {
 
 	private Message _message;
@@ -16,7 +15,7 @@ public class MessageRenderer : MonoBehaviour {
 	}
 
 	private void UpdateColor() {
-		GetComponent<SpriteRenderer>().color = Message == null ? Color.gray : Message.MessageColor;
+		//TODO !
 	}
 
 	public void OpenOrLoad(CSharpExtension.Consumable<Message> callback) {
@@ -24,8 +23,10 @@ public class MessageRenderer : MonoBehaviour {
 			Debug.LogError("ERRROR tried to load messageRenderer " + name + "... But NO message has been provided.");
 			return;
 		}
-		if(IsLoaded)
+		if(IsLoaded) {
+			callback?.Invoke(Message);
 			return;
+		}
 		StartCoroutine(CR_GetMessageDetails(callback));
 	}
 
@@ -41,6 +42,8 @@ public class MessageRenderer : MonoBehaviour {
 				// apply
 				Message.Complete(messageComplete);
 				UpdateColor();
+
+				callback?.Invoke(Message);
 			}
 		}
 	}
