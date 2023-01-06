@@ -336,7 +336,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &512406467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,7 +564,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 619394802}
-  - component: {fileID: 619394801}
   m_Layer: 0
   m_Name: Global Light 2D
   m_TagString: Untagged
@@ -572,18 +571,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &619394801
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 619394800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &619394802
 Transform:
   m_ObjectHideFlags: 0
@@ -1215,7 +1202,19 @@ MonoBehaviour:
     timestampLastUpdate: 0
   onOriginSet:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1423802957}
+        m_TargetAssemblyTypeName: MessagesDisplayer, MessageSeed
+        m_MethodName: PositionInit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onLocationChanged:
     m_PersistentCalls:
       m_Calls:
@@ -1326,6 +1325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 880aeb1c3288b724f83810e5e4af04ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugData: 1
   newMessagesEvent:
     m_PersistentCalls:
       m_Calls:
@@ -1385,6 +1385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56677b1dca6e9374fbc00f38d51cf718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  messagesManager: {fileID: 1381831860}
   rendererPrefab: {fileID: 3431936409295297221, guid: c9ec1611d675a784687cee71a81354a9, type: 3}
 --- !u!4 &1423802958
 Transform:
@@ -1462,7 +1463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locationManager: {fileID: 1010667523}
-  tileBuffer: 1
+  tileBuffer: 0
   zoomLevel: 14
   useCache: 1
   clearCache: 0

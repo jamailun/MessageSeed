@@ -20,12 +20,16 @@ public class Message {
 	public Color MessageColor => AccountManager.IsMe(header.AuthorId) ? Color.yellow : Color.blue;
 
 	// DEBUG constructor
-	private Message(string id, string author, string t, string c) {
+	private Message(string id, string author, string t, string c, Coordinates center) {
 		this.header = new() { id = id, author = author };
 		authorName = author;
 		messageTitle = t;
 		messageContent = c;
 		IsComplete = true;
+
+		Vector2 delta = Random.insideUnitCircle * 1.1f;
+		header.latitude = (float) center.latitude + delta.x;
+		header.longitude = (float) center.longitude + delta.y;
 	}
 
 	public Message(MessageHeader header) {
@@ -52,25 +56,8 @@ public class Message {
 
 	public bool ExistsOnServer => header.id != null;
 
-	public const float EARTH_RADIUS_KM = 6371f;
-	// Code adapted from https://www.geeksforgeeks.org/program-distance-two-points-earth/
-	public float GetDistanceRealWorld(Vector2 realWorldPosition) {
-		float lon1 = realWorldPosition.x * Mathf.Deg2Rad;
-		float lon2 = header.longitude * Mathf.Deg2Rad;
-		float lat1 = realWorldPosition.y * Mathf.Deg2Rad;
-		float lat2 = header.latitude * Mathf.Deg2Rad;
-
-		// Haversine formula
-		float dlon = lon2 - lon1;
-		float dlat = lat2 - lat1;
-		float a = Mathf.Pow(Mathf.Sin(dlat / 2), 2) + Mathf.Cos(lat1) * Mathf.Cos(lat2) * Mathf.Pow(Mathf.Sin(dlon / 2), 2);
-		float c = 2 * Mathf.Asin(Mathf.Sqrt(a));
-
-		return c * EARTH_RADIUS_KM;
-	}
-
-	public static Message DebugMessage(int i) {
-		return new Message("test_" + i, "AUTHOR_TEST", "TEST_" + i, "Message de test n°" + i + ".");
+	public static Message DebugMessage(int i, Coordinates center) {
+		return new("test_" + i, "AUTHOR_TEST", "TEST_" + i, "Message de test n°" + i + ".", center);
 	}
 }
 

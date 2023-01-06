@@ -7,10 +7,13 @@ public class MessageRenderer : MonoBehaviour {
 	private Message _message;
 	private bool IsLoaded => _message != null && _message.IsComplete;
 
+	[GoShared.ShowOnly] private GoShared.Coordinates coordinates;
+
 	public Message Message => _message;
 
 	public void SetMessage(Message message) {
 		this._message = message;
+		coordinates = message.Coordinates;
 		UpdateColor();
 	}
 

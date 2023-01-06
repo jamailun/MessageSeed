@@ -18,7 +18,7 @@ public class MessageDisplay : MonoBehaviour {
 	}
 
 	public void test() {
-		SetMessage(Message.DebugMessage(12));
+		SetMessage(Message.DebugMessage(12, new GoShared.Coordinates(48.858093, 2.294694)));
 	}
 
 	public void SetMessage(Message message) {

@@ -3,9 +3,13 @@ using UnityEngine.Networking;
 using System.Collections.Generic;
 using System.Collections;
 
+using GoMap;
+using GoShared;
+
 public class MessagesManager : MonoBehaviour {
 
 	public static MessagesManager Instance { get; private set; }
+	[SerializeField] private bool debugData = false;
 
 	[SerializeField] private NewMessagesEvent newMessagesEvent;
 
@@ -20,10 +24,25 @@ public class MessagesManager : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 	}
 
-	private CSharpExtension.Consumable<IEnumerable<Message>> callback;
-	public void UpdateMessages(CSharpExtension.Consumable<IEnumerable<Message>> callback = null) {
-		if(callback != null)
-			this.callback = callback;
+	private bool callingServer = false;
+	public void UpdateMessages(Coordinates coordinates) {
+		if(callingServer)
+			return;
+		Debug.LogWarning("updating messages... call");
+		callingServer = true;
+		if(debugData) {
+			if(messages.Count == 0) {
+				messages.Add(Message.DebugMessage(1, coordinates));
+				messages.Add(Message.DebugMessage(2, coordinates));
+				messages.Add(Message.DebugMessage(3, coordinates));
+				messages.Add(Message.DebugMessage(4, coordinates));
+			}
+			newMessagesEvent?.Invoke(messages);
+			callingServer = false;
+			return;
+		}
+		Debug.LogWarning("start calling sever to getmesasges.");
+		// Normal
 		StartCoroutine(CR_UpdateMessagesRequest());
 	}
 
@@ -44,9 +63,9 @@ public class MessagesManager : MonoBehaviour {
 					messages.Add(new Message(header));
 				}
 
-				callback?.Invoke(messages);
 				newMessagesEvent?.Invoke(messages);
 			}
+			callingServer = false;
 		}
 	}
 
@@ -72,8 +91,11 @@ public class MessagesManager : MonoBehaviour {
 				Debug.Log("new message posted successfully !");
 				var data = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
 				successCallback?.Invoke();
-				messages.Add(new Message(new MessageHeader() { author = "4", latitude = GpsPosition.Instance.LastPosition.y, longitude = GpsPosition.Instance.LastPosition.x }));
-				callback?.Invoke(messages);
+				Message msg = new(new MessageHeader() { author = "4", latitude = GpsPosition.Instance.LastPosition.y, longitude = GpsPosition.Instance.LastPosition.x });
+				messages.Add(msg);
+				List<Message> lm = new();
+				lm.Add(msg);
+				newMessagesEvent?.Invoke(lm);
 			}
 		}
 	}
