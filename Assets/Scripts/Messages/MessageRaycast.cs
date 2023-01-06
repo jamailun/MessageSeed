@@ -16,18 +16,15 @@ public class MessageRaycast : MonoBehaviour {
 		}
 
 		if(click) {
-			Debug.LogWarning("TRY RAYCAST");
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
 			Debug.DrawRay(ray.origin, ray.direction.normalized * 1500f, Color.red, 3f);
 
 			if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
 				if(hit.collider.GetComponent<MessageRenderer>() != null) {
-					Debug.Log("FIND MESSAGE !! " + hit.collider);
 					MessageRenderer renderer = hit.collider.GetComponent<MessageRenderer>();
 					renderer.OpenOrLoad(MessageReadyToOpen);
 				}
-				//Coordinates gpsCoordinates = Coordinates.convertVectorToCoordinates(hit.point);
 			}
 		}
 	}
