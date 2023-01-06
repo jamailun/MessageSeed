@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3431936409206417637}
   - component: {fileID: 3431936409206417639}
   - component: {fileID: 3431936409206417636}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3431936409295297220}
   - component: {fileID: 3431936409295297221}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Message3D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,6 +131,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e258a6cb427218a4f925216979671c8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  coordinates:
+    latitude: 0
+    longitude: 0
+    altitude: 0
+    timestampLastUpdate: 0
 --- !u!1 &3431936409478139091
 GameObject:
   m_ObjectHideFlags: 0
@@ -142,7 +147,7 @@ GameObject:
   - component: {fileID: 3431936409478139090}
   - component: {fileID: 3431936409478139084}
   - component: {fileID: 3431936409478139085}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cylinder (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -226,7 +231,7 @@ GameObject:
   - component: {fileID: 3431936410251759831}
   - component: {fileID: 3431936410251759828}
   - component: {fileID: 3431936410251759829}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,7 +327,7 @@ GameObject:
   - component: {fileID: 3431936410660246824}
   - component: {fileID: 3431936410660246826}
   - component: {fileID: 3431936410660246827}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cylinder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
