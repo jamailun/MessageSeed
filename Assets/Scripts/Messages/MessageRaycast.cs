@@ -8,17 +8,22 @@ public class MessageRaycast : MonoBehaviour {
 	public MessageOpenedEvent messageOpenedEvent;
 
 	private void Update() {
-		bool drag;
+		bool click;
 		if(Application.isMobilePlatform) {
-			drag = Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began;
+			click = Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began;
 		} else {
-			drag = Input.GetMouseButton(0) && Input.GetAxisRaw("Mouse X") == 0.0f && Input.GetAxisRaw("Mouse Y") == 0.0f;
+			click = Input.GetMouseButtonDown(0);
 		}
 
-		if(!drag) {
+		if(click) {
+			Debug.LogWarning("TRY RAYCAST");
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+			Debug.DrawRay(ray.origin, ray.direction.normalized * 1500f, Color.red, 3f);
+
 			if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
 				if(hit.collider.GetComponent<MessageRenderer>() != null) {
+					Debug.Log("FIND MESSAGE !! " + hit.collider);
 					MessageRenderer renderer = hit.collider.GetComponent<MessageRenderer>();
 					renderer.OpenOrLoad(MessageReadyToOpen);
 				}
