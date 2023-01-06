@@ -20,20 +20,19 @@ public class MessagesDisplayer : MonoBehaviour {
 	//Debug.Log("POSITION CHANGED " + coordinates);
 		//messagesManager.UpdateMessages(coordinates);
 	}
-
+	
 	public void MessagesAdded(List<Message> messages) {
-		Debug.LogWarning("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		foreach(var msg in messages) {
-			if(renderers.ContainsKey(msg.MessageId))
+			if(renderers.ContainsKey(msg.MessageId)) {
+				Debug.Log("ignoring " + msg);
 				continue;
+			}
 
 			var renderer = Instantiate(rendererPrefab, transform);
 			renderer.SetMessage(msg);
-			renderer.transform.SetPositionAndRotation(msg.Coordinates.convertCoordinateToVector(), Quaternion.identity);
+			renderer.transform.localPosition = msg.Coordinates.convertCoordinateToVector(0, true);
 
 			renderers.Add(msg.MessageId, renderer);
-
-			Debug.Log("DISPLAY NEW MESSAGE " + msg);
 		}
 	}
 

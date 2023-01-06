@@ -7,7 +7,7 @@ public class MessageRenderer : MonoBehaviour {
 	private Message _message;
 	private bool IsLoaded => _message != null && _message.IsComplete;
 
-	[GoShared.ShowOnly] private GoShared.Coordinates coordinates;
+	public GoShared.Coordinates coordinates;
 
 	public Message Message => _message;
 

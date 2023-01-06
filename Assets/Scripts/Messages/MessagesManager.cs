@@ -28,7 +28,6 @@ public class MessagesManager : MonoBehaviour {
 	public void UpdateMessages(Coordinates coordinates) {
 		if(callingServer)
 			return;
-		Debug.LogWarning("updating messages... call");
 		callingServer = true;
 		if(debugData) {
 			if(messages.Count == 0) {

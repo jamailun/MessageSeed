@@ -5,7 +5,8 @@ public class Message {
 
 	public MessageHeader header;
 	public bool IsComplete { get; private set; }
-	public string MessageId => header.AuthorId;
+	public string AuthorId => header.AuthorId;
+	public string MessageId => header.id;
 
 	public string messageTitle;
 	public string messageContent;
@@ -27,9 +28,9 @@ public class Message {
 		messageContent = c;
 		IsComplete = true;
 
-		Vector2 delta = Random.insideUnitCircle * 1.1f;
-		header.latitude = (float) center.latitude + delta.x;
-		header.longitude = (float) center.longitude + delta.y;
+		Vector2 delta = Random.insideUnitCircle * 0.0005f;
+		header.latitude = center.latitude + (double) delta.x;
+		header.longitude = center.longitude + (double) delta.y;
 	}
 
 	public Message(MessageHeader header) {
@@ -49,23 +50,23 @@ public class Message {
 		IsComplete = true;
 	}
 
-	public Vector2 RealWorldPosition {
-		set { header.longitude = value.x; header.latitude = value.y; }
-		get { return new(header.longitude, header.latitude); }
-	}
-
 	public bool ExistsOnServer => header.id != null;
 
 	public static Message DebugMessage(int i, Coordinates center) {
 		return new("test_" + i, "AUTHOR_TEST", "TEST_" + i, "Message de test n°" + i + ".", center);
 	}
+
+	public override string ToString() {
+		return "MSG{" + MessageId + ", title=" + messageTitle + ", pos=" + Coordinates + "}";
+	}
+
 }
 
 [System.Serializable]
 public struct MessageHeader {
 	public string id;
 	public string author;
-	public float latitude, longitude;
+	public double latitude, longitude;
 
 	public Coordinates Coordinates => new(latitude, longitude);
 
