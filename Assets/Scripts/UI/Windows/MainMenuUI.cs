@@ -8,6 +8,10 @@ public class MainMenuUI : MonoBehaviour {
 
 	private readonly List<MainMenuWindowUI> windows = new();
 
+	public bool IsSomethingOpen() {
+		return state != State.DEFAULT;
+	}
+
 	private void Start() {
 		// add all windows
 		windows.AddRange(GetComponentsInChildren<MainMenuWindowUI>());

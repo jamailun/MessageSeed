@@ -4,6 +4,7 @@ using UnityEngine.Events;
 public class MessageRaycast : MonoBehaviour {
 
 	[SerializeField] private LayerMask layerMask;
+	[SerializeField] private MainMenuUI guiManager;
 
 	public MessageOpenedEvent messageOpenedEvent;
 
@@ -15,7 +16,7 @@ public class MessageRaycast : MonoBehaviour {
 			click = Input.GetMouseButtonDown(0);
 		}
 
-		if(click) {
+		if(click && !guiManager.IsSomethingOpen()) {
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
 			Debug.DrawRay(ray.origin, ray.direction.normalized * 1500f, Color.red, 3f);
