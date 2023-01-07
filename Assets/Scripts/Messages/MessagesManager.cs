@@ -96,13 +96,15 @@ public class MessagesManager : MonoBehaviour {
 				Debug.Log("new message posted successfully !");
 				successCallback?.Invoke();
 
-				Message msg = new(new MessageHeader() { author = AccountManager.Account.accountId, latitude = dataSent.latitude, longitude = dataSent.longitude });
+				var header = JsonUtility.FromJson<MessageHeader>(www.downloadHandler.text);
+				var body = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
+
+				Message msg = new(header);
+				msg.Complete(body);
 				messages.Add(msg);
 
 				Debug.Log("created new message " +msg);
-				List<Message> lm = new();
-				lm.Add(msg);
-				newMessagesEvent?.Invoke(lm);
+				newMessagesEvent?.Invoke(CSharpExtension.AsList(msg));
 			}
 		}
 	}
@@ -117,8 +119,8 @@ public class MessagesManager : MonoBehaviour {
 		public MessageCreateRequest(string title, string content, Coordinates coordinates) {
 			this.title = title;
 			this.message = content;
-			this.longitude = coordinates.longitude;
-			this.latitude = coordinates.latitude;
+			this.longitude = System.Math.Round(coordinates.longitude, 14);
+			this.latitude = System.Math.Round(coordinates.latitude, 14);
 		}
 	}
 
