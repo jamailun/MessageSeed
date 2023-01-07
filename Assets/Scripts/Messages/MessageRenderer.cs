@@ -4,7 +4,8 @@ using UnityEngine.Networking;
 
 public class MessageRenderer : MonoBehaviour {
 
-	private Message _message;
+// DEBUUUG !!!
+	[SerializeField] private Message _message;
 	private bool IsLoaded => _message != null && _message.IsComplete;
 
 	public Message Message => _message;

@@ -31,14 +31,14 @@ public class MessagesDisplayer : MonoBehaviour {
 			var renderer = Instantiate(rendererPrefab, transform);
 			renderer.SetMessage(msg);
 			renderer.gameObject.name = "MessageRenderer["+msg.MessageId+"]";
-			renderer.transform.localPosition = msg.Coordinates.convertCoordinateToVector(0, true);
+			renderer.transform.localPosition = msg.Coordinates.convertCoordinateToVector(0);
 
 			renderers.Add(msg.MessageId, renderer);
 		}
 	}
 
 	public void TileLoaded(GOTile tile) {
-		Debug.Log("TILE " + tile.name + " loaded. center=" + tile.goTile.tileCenter);
+		//Debug.Log("TILE " + tile.name + " loaded. center=" + tile.goTile.tileCenter);
 	}
 	
 	

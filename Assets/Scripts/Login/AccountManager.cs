@@ -76,6 +76,7 @@ public class AccountManager : MonoBehaviour {
 			} else {
 				var data = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
 				SetLoginComplete(data, user);
+				Debug.Log("LOGIN COMPLETED !");
 				successCallback?.Invoke();
 			}
 		}
