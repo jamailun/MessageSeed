@@ -14,6 +14,7 @@ public class MessagesManager : MonoBehaviour {
 	[SerializeField] private NewMessagesEvent newMessagesEvent;
 
 	private readonly List<Message> messages = new();
+	private Coordinates lastCoordinates;
 
 	private void Awake() {
 		if(Instance) {
@@ -26,6 +27,7 @@ public class MessagesManager : MonoBehaviour {
 
 	private bool callingServer = false;
 	public void UpdateMessages(Coordinates coordinates) {
+		lastCoordinates = coordinates;
 		if(callingServer)
 			return;
 		callingServer = true;
@@ -77,7 +79,8 @@ public class MessagesManager : MonoBehaviour {
 	}
 
 	private IEnumerator CR_SendCreateMessage(string title, string content, CSharpExtension.Consumable<string> errorCallback, CSharpExtension.Runnable successCallback) {
-		string postData = JsonUtility.ToJson(new MessageCreateRequest(title, content));
+		var dataSent = new MessageCreateRequest(title, content, lastCoordinates);
+		string postData = JsonUtility.ToJson(dataSent);
 		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
 
 		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest("/database/message/create/", postDataRaw, true)) {
@@ -90,7 +93,7 @@ public class MessagesManager : MonoBehaviour {
 				Debug.Log("new message posted successfully !");
 				var data = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
 				successCallback?.Invoke();
-				Message msg = new(new MessageHeader() { author = "4", latitude = GpsPosition.Instance.LastPosition.y, longitude = GpsPosition.Instance.LastPosition.x });
+				Message msg = new(new MessageHeader() { author = AccountManager.Account.accountId, latitude = dataSent.latitude, longitude = dataSent.longitude });
 				messages.Add(msg);
 				List<Message> lm = new();
 				lm.Add(msg);
@@ -102,17 +105,15 @@ public class MessagesManager : MonoBehaviour {
 	[System.Serializable]
 	private struct MessageCreateRequest {
 		public string title;
-		public string author;
 		public string message;
-		public float latitude;
-		public float longitude;
+		public double latitude;
+		public double longitude;
 
-		public MessageCreateRequest(string title, string content) {
+		public MessageCreateRequest(string title, string content, Coordinates coordinates) {
 			this.title = title;
 			this.message = content;
-			this.author = "4"; // DOBUG
-			this.longitude = GpsPosition.Instance.LastPosition.x;
-			this.latitude = GpsPosition.Instance.LastPosition.y;
+			this.longitude = coordinates.longitude;
+			this.latitude = coordinates.latitude;
 		}
 	}
 

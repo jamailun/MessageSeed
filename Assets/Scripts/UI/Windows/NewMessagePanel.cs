@@ -55,7 +55,7 @@ public class NewMessagePanel : MonoBehaviour {
 	private string Validate(string header, string content) {
 		if(header.Length < 5)
 			return "Message title is too short";
-		if(content.Length < 15)
+		if(content.Length < 5)
 			return "Message content is too short";
 		// More validations
 		return null;
