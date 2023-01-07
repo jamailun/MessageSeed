@@ -28,14 +28,14 @@ public class MessageRenderer : MonoBehaviour {
 	}
 
 	private IEnumerator CR_GetMessageDetails(CSharpExtension.Consumable<Message> callback) {
-		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/"+Message.MessageId+"/")) {
+		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/message/" + Message.MessageId+"/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
 			} else {
 				var messageComplete = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
 				Message.Complete(messageComplete);
-				Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete);
+				Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete+"\n"+www.downloadHandler.text);
 				callback?.Invoke(Message);
 			}
 		}

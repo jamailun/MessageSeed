@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public static class CSharpExtension {
 
@@ -15,6 +16,12 @@ public static class CSharpExtension {
 		foreach(Transform child in transform) {
 			Object.Destroy(child.gameObject);
 		}
+	}
+
+	public static List<T> AsList<T>(T obj) {
+		List<T> l = new();
+		l.Add(obj);
+		return l;
 	}
 
 	/// <summary>
