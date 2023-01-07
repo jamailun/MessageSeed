@@ -35,7 +35,7 @@ public class NewMessagePanel : MonoBehaviour {
 	}
 
 	private void MessageSendingError(string error) {
-		// TODO
+		Debug.LogError("ERROR : could NOT send message. Error is \"" + error + "\".");
 	}
 	private void MessageSendingOver() {
 		// clear

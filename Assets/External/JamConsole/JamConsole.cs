@@ -108,6 +108,8 @@ namespace JamUtils2D.JamConsole {
             visibilityButton.GetComponentInChildren<TMP_Text>().text = visible ? "Hide" : "Show";
             visibilityButton.GetComponent<Image>().enabled = true;
             visibilityButton.GetComponentInChildren<TMP_Text>().enabled = true;
+
+            inputField.gameObject.SetActive(visible);
         }
 
     }

@@ -94,10 +94,12 @@ public class MessagesManager : MonoBehaviour {
 				errorCallback?.Invoke(www.error + " : " + www.downloadHandler?.text);
 			} else {
 				Debug.Log("new message posted successfully !");
-				var data = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
 				successCallback?.Invoke();
+
 				Message msg = new(new MessageHeader() { author = AccountManager.Account.accountId, latitude = dataSent.latitude, longitude = dataSent.longitude });
 				messages.Add(msg);
+
+				Debug.Log("created new message " +msg);
 				List<Message> lm = new();
 				lm.Add(msg);
 				newMessagesEvent?.Invoke(lm);
