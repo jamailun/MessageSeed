@@ -6,17 +6,12 @@ public class MessageRenderer : MonoBehaviour {
 
 // DEBUUUG !!!
 	[SerializeField] private Message _message;
-	private bool IsLoaded => _message != null && _message.IsComplete;
+	private bool IsLoaded => _message.IsComplete;
 
 	public Message Message => _message;
 
 	public void SetMessage(Message message) {
 		this._message = message;
-		UpdateColor();
-	}
-
-	private void UpdateColor() {
-		//TODO !
 	}
 
 	public void OpenOrLoad(CSharpExtension.Consumable<Message> callback) {
@@ -25,6 +20,7 @@ public class MessageRenderer : MonoBehaviour {
 			return;
 		}
 		if(IsLoaded) {
+			Debug.Log("message already loaded...");
 			callback?.Invoke(Message);
 			return;
 		}
@@ -37,13 +33,9 @@ public class MessageRenderer : MonoBehaviour {
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
 			} else {
-				Debug.Log("success get messages !");
-				Debug.Log(www.downloadHandler.text);
 				var messageComplete = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
-				// apply
 				Message.Complete(messageComplete);
-				UpdateColor();
-
+				Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete);
 				callback?.Invoke(Message);
 			}
 		}

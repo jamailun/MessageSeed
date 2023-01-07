@@ -31,6 +31,7 @@ public class MessageRaycast : MonoBehaviour {
 	}
 
 	private void MessageReadyToOpen(Message message) {
+		Debug.Log("MESSAGE READY TO OPEN : " + message);
 		messageOpenedEvent?.Invoke(message);
 	}
 

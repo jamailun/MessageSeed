@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using GoShared;
 
+[System.Serializable]
 public class Message {
 
 	public MessageHeader header;
@@ -45,8 +46,8 @@ public class Message {
 		}
 		authorName = message.author_name;
 		messageTitle = message.title;
-		messageContent = message.content;
-		likesAmount = message.likesAmount;
+		messageContent = message.message;
+		likesAmount = message.likes_count;
 		IsComplete = true;
 	}
 
@@ -89,9 +90,15 @@ public struct MessageHeader {
 [System.Serializable]
 public struct MessageComplete {
 	public string title;
-	public string content;
+	public string message;
+	public double unix_post_date;
+	public double unix_death_date;
 	public string author_name;
-	public int likesAmount;
+	public int likes_count;
+
+	public override string ToString() {
+		return "MessageComplete{'" + title + "', auth=" + author_name + ", likes=" + likes_count + "}";
+	}
 }
 
 [System.Serializable]

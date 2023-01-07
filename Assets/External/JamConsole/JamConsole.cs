@@ -12,13 +12,17 @@ namespace JamUtils2D.JamConsole {
 
         [Header("Scene config")]
         // output
-        [SerializeField] private TMP_Text textPrefab;
+        [SerializeField] private JamConsoleLine linePrefab;//TMP_Text textPrefab;
         [SerializeField] private VerticalLayoutGroup container;
         [SerializeField] private ScrollRect scrollbar;
         // input
         [SerializeField] private SubmitWithButton inputField;
         // all
         [SerializeField] private Button visibilityButton;
+
+        [Header("Persistence config")]
+        [SerializeField] private bool dontDestroyOnLoad = true;
+        [SerializeField] private bool startHidden = true;
 
         // Fields
         private static JamConsole Instance;
@@ -33,6 +37,16 @@ namespace JamUtils2D.JamConsole {
 			}
             Instance = this;
 		}
+
+		private void Start() {
+            if(dontDestroyOnLoad) {
+                DontDestroyOnLoad(gameObject);
+	    	}
+            if(startHidden) {
+                visible = false;
+                ApplyVisibility();
+            }
+        }
 
 		void OnEnable() {
             Application.logMessageReceived += MessageReceived;
@@ -61,10 +75,8 @@ namespace JamUtils2D.JamConsole {
             float scrollbarPosition = scrollbar.verticalNormalizedPosition;
 
             // Add the line
-            var line = Instantiate(textPrefab, container.transform);
-            line.text = lineContent;
-            line.color = color;
-            line.enabled = visible;
+            var line = Instantiate(linePrefab, container.transform);
+            line.SetText(lineContent, color, visible);
 
             // put scrollbar value to the old one (after recalculation).
             StartCoroutine(ApplyScrollPosition(scrollbar, scrollbarPosition));

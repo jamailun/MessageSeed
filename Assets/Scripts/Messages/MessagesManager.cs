@@ -25,13 +25,17 @@ public class MessagesManager : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 	}
 
+	public void UpdatePosition(Coordinates coordinates) {
+		lastCoordinates = coordinates;
+	}
+
 	private bool callingServer = false;
 	public void UpdateMessages(Coordinates coordinates) {
-		lastCoordinates = coordinates;
 		if(callingServer)
 			return;
 		callingServer = true;
 		if(debugData) {
+			Debug.LogWarning("DEBUG mode for MessagesManager. Debug data will be provided.");
 			if(messages.Count == 0) {
 				messages.Add(Message.DebugMessage(1, coordinates));
 				messages.Add(Message.DebugMessage(2, coordinates));
@@ -42,7 +46,6 @@ public class MessagesManager : MonoBehaviour {
 			callingServer = false;
 			return;
 		}
-		Debug.LogWarning("start calling sever to getmesasges.");
 		// Normal
 		StartCoroutine(CR_UpdateMessagesRequest());
 	}
@@ -54,7 +57,7 @@ public class MessagesManager : MonoBehaviour {
 				Debug.LogError(www.error + ". URL=["+www.url+"] Request feedback: [" + www.downloadHandler?.text+"]");
 			} else {
 				string json = www.downloadHandler.text;
-				Debug.Log("success get messages : " + json);
+				Debug.Log("Success gettin messages list : " + json);
 
 				// Unity CANNOT handle [{}...]. It needs to be wrapped as {list:[{}...]}
 				string jsonWrapped = WrapJsonToClass(json, "list");

@@ -12,12 +12,13 @@ public class MessagesDisplayer : MonoBehaviour {
 
 	public void PositionInit(Coordinates coordinates) {
 		Debug.LogWarning("POSITION INIT " + coordinates);
+		messagesManager.UpdatePosition(coordinates);
 		messagesManager.UpdateMessages(coordinates);
 	}
 
 	public void PositionChanged(Coordinates coordinates) {
-		// compute distance and stuff	
-	//Debug.Log("POSITION CHANGED " + coordinates);
+		messagesManager.UpdatePosition(coordinates);
+		//TODO IF DISTANCE LRAGE? UPDATE
 		//messagesManager.UpdateMessages(coordinates);
 	}
 	
