@@ -2,21 +2,16 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-[RequireComponent(typeof(SpriteRenderer))]
 public class MessageRenderer : MonoBehaviour {
 
-	private Message _message;
-	private bool IsLoaded => _message != null && _message.IsComplete;
+// DEBUUUG !!!
+	[SerializeField] private Message _message;
+	private bool IsLoaded => _message.IsComplete;
 
 	public Message Message => _message;
 
 	public void SetMessage(Message message) {
 		this._message = message;
-		UpdateColor();
-	}
-
-	private void UpdateColor() {
-		GetComponent<SpriteRenderer>().color = Message == null ? Color.gray : Message.MessageColor;
 	}
 
 	public void OpenOrLoad(CSharpExtension.Consumable<Message> callback) {
@@ -24,8 +19,11 @@ public class MessageRenderer : MonoBehaviour {
 			Debug.LogError("ERRROR tried to load messageRenderer " + name + "... But NO message has been provided.");
 			return;
 		}
-		if(IsLoaded)
+		if(IsLoaded) {
+			Debug.Log("message already loaded...");
+			callback?.Invoke(Message);
 			return;
+		}
 		StartCoroutine(CR_GetMessageDetails(callback));
 	}
 
@@ -35,12 +33,10 @@ public class MessageRenderer : MonoBehaviour {
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
 			} else {
-				Debug.Log("success get messages !");
-				Debug.Log(www.downloadHandler.text);
 				var messageComplete = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
-				// apply
 				Message.Complete(messageComplete);
-				UpdateColor();
+				Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete);
+				callback?.Invoke(Message);
 			}
 		}
 	}

@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
-using System.Linq;
-using System.Collections.Generic;
+using GoShared;
 
+[System.Serializable]
 public class Message {
 
 	public MessageHeader header;
 	public bool IsComplete { get; private set; }
-	public string MessageId => header.AuthorId;
+	public string AuthorId => header.AuthorId;
+	public string MessageId => header.id;
 
 	public string messageTitle;
 	public string messageContent;
@@ -16,15 +17,21 @@ public class Message {
 	public long deathTime; // timecode of the death
 	public long likesAmount;
 
+	public GoShared.Coordinates Coordinates => header.Coordinates;
+
 	public Color MessageColor => AccountManager.IsMe(header.AuthorId) ? Color.yellow : Color.blue;
 
 	// DEBUG constructor
-	private Message(string id, string author, string t, string c) {
+	private Message(string id, string author, string t, string c, Coordinates center) {
 		this.header = new() { id = id, author = author };
 		authorName = author;
 		messageTitle = t;
 		messageContent = c;
 		IsComplete = true;
+
+		Vector2 delta = Random.insideUnitCircle * 0.0005f;
+		header.latitude = center.latitude + (double) delta.x;
+		header.longitude = center.longitude + (double) delta.y;
 	}
 
 	public Message(MessageHeader header) {
@@ -39,45 +46,30 @@ public class Message {
 		}
 		authorName = message.author_name;
 		messageTitle = message.title;
-		messageContent = message.content;
-		likesAmount = message.likesAmount;
+		messageContent = message.message;
+		likesAmount = message.likes_count;
 		IsComplete = true;
-	}
-
-	public Vector2 RealWorldPosition {
-		set { header.longitude = value.x; header.latitude = value.y; }
-		get { return new(header.longitude, header.latitude); }
 	}
 
 	public bool ExistsOnServer => header.id != null;
 
-	public const float EARTH_RADIUS_KM = 6371f;
-	// Code adapted from https://www.geeksforgeeks.org/program-distance-two-points-earth/
-	public float GetDistanceRealWorld(Vector2 realWorldPosition) {
-		float lon1 = realWorldPosition.x * Mathf.Deg2Rad;
-		float lon2 = header.longitude * Mathf.Deg2Rad;
-		float lat1 = realWorldPosition.y * Mathf.Deg2Rad;
-		float lat2 = header.latitude * Mathf.Deg2Rad;
-
-		// Haversine formula
-		float dlon = lon2 - lon1;
-		float dlat = lat2 - lat1;
-		float a = Mathf.Pow(Mathf.Sin(dlat / 2), 2) + Mathf.Cos(lat1) * Mathf.Cos(lat2) * Mathf.Pow(Mathf.Sin(dlon / 2), 2);
-		float c = 2 * Mathf.Asin(Mathf.Sqrt(a));
-
-		return c * EARTH_RADIUS_KM;
+	public static Message DebugMessage(int i, Coordinates center) {
+		return new("test_" + i, "AUTHOR_TEST", "TEST_" + i, "Message de test n°" + i + ".", center);
 	}
 
-	public static Message DebugMessage(int i) {
-		return new Message("test_" + i, "AUTHOR_TEST", "TEST_" + i, "Message de test n°" + i + ".");
+	public override string ToString() {
+		return "MSG{" + MessageId + ", title=" + messageTitle + ", pos=" + Coordinates + "}";
 	}
+
 }
 
 [System.Serializable]
 public struct MessageHeader {
 	public string id;
 	public string author;
-	public float latitude, longitude;
+	public double latitude, longitude;
+
+	public Coordinates Coordinates => new(latitude, longitude);
 
 	public string AuthorId {
 		get {
@@ -98,9 +90,15 @@ public struct MessageHeader {
 [System.Serializable]
 public struct MessageComplete {
 	public string title;
-	public string content;
+	public string message;
+	public double unix_post_date;
+	public double unix_death_date;
 	public string author_name;
-	public int likesAmount;
+	public int likes_count;
+
+	public override string ToString() {
+		return "MessageComplete{'" + title + "', auth=" + author_name + ", likes=" + likes_count + "}";
+	}
 }
 
 [System.Serializable]

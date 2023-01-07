@@ -973,11 +973,13 @@ MonoBehaviour:
     _colorLog: {r: 1, g: 1, b: 1, a: 1}
     _colorWarn: {r: 1, g: 0.68509114, b: 0.015686274, a: 1}
     _colorError: {r: 0.7735849, g: 0, b: 0, a: 1}
-  textPrefab: {fileID: 805769968352841228, guid: 167f6380b1ebfdd4889e2063b937230a, type: 3}
+  linePrefab: {fileID: 9213315100657844227, guid: 167f6380b1ebfdd4889e2063b937230a, type: 3}
   container: {fileID: 2346128684148431604}
   scrollbar: {fileID: 2346128684605878126}
   inputField: {fileID: 8147902464952829057}
   visibilityButton: {fileID: 3797760247220380365}
+  dontDestroyOnLoad: 0
+  startHidden: 1
 --- !u!114 &2346128685562635820
 MonoBehaviour:
   m_ObjectHideFlags: 0

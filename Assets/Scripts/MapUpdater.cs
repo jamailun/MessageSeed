@@ -6,7 +6,6 @@ public class MapUpdater : MonoBehaviour {
 
 	private double _lastUpdate = 0;
 
-
 	private void Start() {
 		PerspectivePan.Instance.moveEvent += UserMoved;
 		PerspectivePan.Instance.zoomEvent += UserZoomed;
@@ -27,7 +26,7 @@ public class MapUpdater : MonoBehaviour {
 			Debug.Log("Update (" + _lastUpdate + ") : [" + GpsPosition.Instance.LastPosition.x + "; " + GpsPosition.Instance.LastPosition.y + "]");
 			_mapRenderer.SetPosition(position);
 			_mapRenderer.UpdateMap();
-			MessagesManager.Instance.UpdateMessages(position.x, position.y, _mapRenderer.Zoom, _mapRenderer.UpdateMessages);
+			MessagesManager.Instance.UpdateMessages(null); // NON
 		}
 	}
 
@@ -62,5 +61,5 @@ public class MapUpdater : MonoBehaviour {
 			_mapRenderer.UpdateGridVisibility();
 		}
 	}
-
+	
 }
