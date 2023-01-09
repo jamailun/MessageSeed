@@ -12,33 +12,34 @@ public class MessagesDisplayer : MonoBehaviour {
 
 	public void PositionInit(Coordinates coordinates) {
 		Debug.LogWarning("POSITION INIT " + coordinates);
+		messagesManager.UpdatePosition(coordinates);
 		messagesManager.UpdateMessages(coordinates);
 	}
 
 	public void PositionChanged(Coordinates coordinates) {
-		// compute distance and stuff	
-	//Debug.Log("POSITION CHANGED " + coordinates);
+		messagesManager.UpdatePosition(coordinates);
+		//TODO IF DISTANCE LRAGE? UPDATE
 		//messagesManager.UpdateMessages(coordinates);
 	}
-
+	
 	public void MessagesAdded(List<Message> messages) {
-		Debug.LogWarning("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 		foreach(var msg in messages) {
-			if(renderers.ContainsKey(msg.MessageId))
+			if(renderers.ContainsKey(msg.MessageId)) {
+				Debug.Log("ignoring " + msg);
 				continue;
+			}
 
 			var renderer = Instantiate(rendererPrefab, transform);
 			renderer.SetMessage(msg);
-			renderer.transform.SetPositionAndRotation(msg.Coordinates.convertCoordinateToVector(), Quaternion.identity);
+			renderer.gameObject.name = "MessageRenderer["+msg.MessageId+"]";
+			renderer.transform.localPosition = msg.Coordinates.convertCoordinateToVector(0);
 
 			renderers.Add(msg.MessageId, renderer);
-
-			Debug.Log("DISPLAY NEW MESSAGE " + msg);
 		}
 	}
 
 	public void TileLoaded(GOTile tile) {
-		Debug.Log("TILE " + tile.name + " loaded. center=" + tile.goTile.tileCenter);
+		//Debug.Log("TILE " + tile.name + " loaded. center=" + tile.goTile.tileCenter);
 	}
 	
 	

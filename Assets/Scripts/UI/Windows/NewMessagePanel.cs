@@ -35,7 +35,7 @@ public class NewMessagePanel : MonoBehaviour {
 	}
 
 	private void MessageSendingError(string error) {
-		// TODO
+		Debug.LogError("ERROR : could NOT send message. Error is \"" + error + "\".");
 	}
 	private void MessageSendingOver() {
 		// clear
@@ -55,7 +55,7 @@ public class NewMessagePanel : MonoBehaviour {
 	private string Validate(string header, string content) {
 		if(header.Length < 5)
 			return "Message title is too short";
-		if(content.Length < 15)
+		if(content.Length < 5)
 			return "Message content is too short";
 		// More validations
 		return null;

@@ -4,21 +4,14 @@ using UnityEngine.Networking;
 
 public class MessageRenderer : MonoBehaviour {
 
-	private Message _message;
-	private bool IsLoaded => _message != null && _message.IsComplete;
-
-	[GoShared.ShowOnly] private GoShared.Coordinates coordinates;
+// DEBUUUG !!!
+	[SerializeField] private Message _message;
+	private bool IsLoaded => _message.IsComplete;
 
 	public Message Message => _message;
 
 	public void SetMessage(Message message) {
 		this._message = message;
-		coordinates = message.Coordinates;
-		UpdateColor();
-	}
-
-	private void UpdateColor() {
-		//TODO !
 	}
 
 	public void OpenOrLoad(CSharpExtension.Consumable<Message> callback) {
@@ -27,6 +20,7 @@ public class MessageRenderer : MonoBehaviour {
 			return;
 		}
 		if(IsLoaded) {
+			Debug.Log("message already loaded...");
 			callback?.Invoke(Message);
 			return;
 		}
@@ -34,18 +28,14 @@ public class MessageRenderer : MonoBehaviour {
 	}
 
 	private IEnumerator CR_GetMessageDetails(CSharpExtension.Consumable<Message> callback) {
-		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/"+Message.MessageId+"/")) {
+		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/message/" + Message.MessageId+"/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
 			} else {
-				Debug.Log("success get messages !");
-				Debug.Log(www.downloadHandler.text);
 				var messageComplete = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
-				// apply
 				Message.Complete(messageComplete);
-				UpdateColor();
-
+				Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete+"\n"+www.downloadHandler.text);
 				callback?.Invoke(Message);
 			}
 		}
