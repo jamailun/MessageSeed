@@ -20,7 +20,7 @@ public class DynamicAvatar : MonoBehaviour {
 			return;
 		}
 		// Load asset
-		var asset = (VariantModel) UnityEditor.AssetDatabase.LoadAssetAtPath($"Assets/Resources/ModelVariant/{colorName}.asset", typeof(VariantModel));
+		var asset = Resources.Load<VariantModel>("ModelVariant/"+colorName);
 		if(asset == null) {
 			ChangeColor(defaultModel);
 			return;
