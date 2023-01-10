@@ -9,6 +9,7 @@ public static class LocalData {
 	private const string TOKEN_REFRESH = PREFIX + "token.refresh";
 
 	private const string PREFS_MODEL = PREFIX + "prefs.model";
+	private const string PREFS_SKY = PREFIX + "prefs.sky";
 
 	public static bool HasAccount() {
 		return PlayerPrefs.HasKey(USERNAME)
@@ -41,10 +42,17 @@ public static class LocalData {
 	public static string GetPreferredModel() {
 		return PlayerPrefs.GetString(PREFS_MODEL);
 	}
+	public static string GetPreferredSky() {
+		return PlayerPrefs.GetString(PREFS_SKY);
+	}
 
 	public static void SavePreferredModel(VariantModel model) {
 		PlayerPrefs.SetString(PREFS_MODEL, model.VariantName);
 		PlayerPrefs.Save();
 	}
-	
+	public static void SavePreferredSky(VariantSky model) {
+		PlayerPrefs.SetString(PREFS_SKY, model.VariantName);
+		PlayerPrefs.Save();
+	}
+
 }
