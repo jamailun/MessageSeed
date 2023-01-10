@@ -22,7 +22,6 @@ public class MessagesManager : MonoBehaviour {
 			return;
 		}
 		Instance = this;
-		DontDestroyOnLoad(gameObject);
 	}
 
 	public void UpdatePosition(Coordinates coordinates) {

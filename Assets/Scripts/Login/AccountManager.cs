@@ -8,18 +8,13 @@ public class AccountManager : MonoBehaviour {
 	public static AccountManager Instance { get; private set; }
 
 	[Header("Configuration")]
+	[SerializeField] private string loginSceneName = "LoginScene";
 	[SerializeField] private string mainSceneName = "MainScene";
 
-	[Header("Debug")]
-	[SerializeField] private string _debugUser;
-	[SerializeField] private string _debugPass;
-	[SerializeField] private bool _debugMode;
-
-
-	public static string Token { get; private set; }
-	private static string TokenRefresh { get; set; }
+	public static string Token => Account.tokenAccess;
+	private static string TokenRefresh => Account.tokenRefresh;
 	public static Account Account { get; private set; }
-	public static bool IsLogged => Token != null;
+	public static bool IsLogged => Account != null && Token != null;
 
 	public static bool IsMe(string id) {
 		return Account != null && id == Account.accountId;
@@ -37,10 +32,11 @@ public class AccountManager : MonoBehaviour {
 	}
 
 	private void Start() {
-		// DEBUG
-		if(_debugMode) {
-			Debug.LogWarning("DEBUG for AccountManager.");
-			TryLogin(_debugUser, _debugPass);
+		// try log-in directly
+		if(LocalData.HasAccount()) {
+			Account = LocalData.GetAccount();
+			Debug.Log("Data found. Username is '" + Account.username + "'.");
+			SceneManager.LoadScene(mainSceneName);
 		}
 	}
 
@@ -53,12 +49,19 @@ public class AccountManager : MonoBehaviour {
 		StartCoroutine(CR_SendLogin(username, password, errorCallback, successCallback));
 	}
 
+	public void TryLogout() {
+		if(!IsLogged) {
+			Debug.LogWarning("Tried to log-out... But you're NOT logged-in !");
+			return;
+		}
+		StartCoroutine(CR_SendLogout());
+	}
+
 	private void SetLoginComplete(LoginResponse response, string username) {
-		// Set tokens
-		Token = response.access;
-		TokenRefresh = response.refresh;
 		// fill account data
-		Account = new() { accountId = "?", username = username };
+		Account = new() { accountId = "?", username = username, tokenAccess = response.access, tokenRefresh = response.refresh };
+		LocalData.SaveAccount(Account);
+		Debug.Log("Saved local data.");
 		// Go to the main scene.
 		SceneManager.LoadScene(mainSceneName);
 	}
@@ -81,6 +84,22 @@ public class AccountManager : MonoBehaviour {
 			}
 		}
 	}
+	private IEnumerator CR_SendLogout() {
+		string postData = JsonUtility.ToJson(new LogoutRequest(TokenRefresh));
+		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest("/api_auth/logout/", postDataRaw, true)) {
+			yield return www.SendWebRequest();
+
+			if(www.result != UnityWebRequest.Result.Success) {
+				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
+			} else {
+				Debug.Log("LOGOUT COMPLETED !");
+				LocalData.ClearAccount();
+				Account = null;
+				SceneManager.LoadScene(loginSceneName);
+			}
+		}
+	}
 }
 
 [System.Serializable]
@@ -96,5 +115,12 @@ internal struct LoginRequest {
 	internal LoginRequest(string u, string p) {
 		username = u;
 		password = p;
+	}
+}
+[System.Serializable]
+internal struct LogoutRequest {
+	public string refresh_token;
+	internal LogoutRequest(string refresh_token) {
+		this.refresh_token = refresh_token;
 	}
 }
