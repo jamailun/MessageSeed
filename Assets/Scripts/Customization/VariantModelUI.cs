@@ -5,19 +5,17 @@ using UnityEngine.UI;
 public class VariantModelUI : MonoBehaviour {
 
 	[SerializeField] private VariantModel model;
+	public VariantModel Model => model;
+	private PlayerCustomizationUI parent;
 
 	private void Awake() {
 		GetComponent<Image>().color = model.VariantColor;
-	}
-
-	private void Start() {
-		
+		parent = GetComponentInParent<PlayerCustomizationUI>();
 	}
 
 	public void LocalClick() {
 		Debug.Log("new color : " + model.name);
-		DynamicAvatar.Instance?.ChangeColor(model);
-		LocalData.SavePreferredModel(model);
+		parent.ChangeColor(model);
 	}
 
 }
