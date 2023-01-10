@@ -17,6 +17,10 @@ public class RemoteApiManager : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 	}
 
+	public UnityWebRequest CreatePostRequest(string url, bool auth = false) {
+		return CreatePostRequest(url, System.Text.Encoding.UTF8.GetBytes(string.Empty), auth);
+	}
+
 	public UnityWebRequest CreatePostRequest(string url, byte[] param, bool auth = false) {
 		var www = UnityWebRequest.Put(GetUrl(url), param); // create as a Put, but...
 		www.method = "POST"; //... set to POST. This is a workaround to easily pass bytes to a POST.

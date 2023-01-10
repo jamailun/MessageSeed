@@ -4,35 +4,48 @@ public static class LocalData {
 
 	private const string PREFIX = "jp.messageseed.";
 
+	private const string USERNAME = PREFIX + "username";
+	private const string TOKEN_ACCESS = PREFIX + "token.access";
+	private const string TOKEN_REFRESH = PREFIX + "token.refresh";
+
+	private const string PREFS_MODEL = PREFIX + "prefs.model";
+
 	public static bool HasAccount() {
-		return PlayerPrefs.HasKey(PREFIX + "username")
-			&& PlayerPrefs.HasKey(PREFIX + "token.access")
-			&& PlayerPrefs.HasKey(PREFIX + "token.refresh");
+		return PlayerPrefs.HasKey(USERNAME)
+			&& PlayerPrefs.HasKey(TOKEN_ACCESS)
+			&& PlayerPrefs.HasKey(TOKEN_REFRESH);
 	}
 
 	public static Account GetAccount() {
 		return new Account() {
-			username = PlayerPrefs.GetString(PREFIX + "username"),
-			tokenAccess = PlayerPrefs.GetString(PREFIX + "token.access"),
-			tokenRefresh = PlayerPrefs.GetString(PREFIX + "token.refresh")
+			username = PlayerPrefs.GetString(USERNAME),
+			tokenAccess = PlayerPrefs.GetString(TOKEN_ACCESS),
+			tokenRefresh = PlayerPrefs.GetString(TOKEN_REFRESH)
 		};
 	}
 
 	public static void SaveAccount(Account account) {
-		PlayerPrefs.SetString(PREFIX + "username", account.username);
-		PlayerPrefs.SetString(PREFIX + "token.access", account.tokenAccess);
-		PlayerPrefs.SetString(PREFIX + "token.refresh", account.tokenRefresh);
+		PlayerPrefs.SetString(USERNAME, account.username);
+		PlayerPrefs.SetString(TOKEN_ACCESS, account.tokenAccess);
+		PlayerPrefs.SetString(TOKEN_REFRESH, account.tokenRefresh);
+		PlayerPrefs.Save();
+	}
+
+	public static void ClearAccount() {
+		PlayerPrefs.DeleteKey(USERNAME);
+		PlayerPrefs.DeleteKey(TOKEN_ACCESS);
+		PlayerPrefs.DeleteKey(TOKEN_REFRESH);
 		PlayerPrefs.Save();
 	}
 
 	public static PlayerPreferences GetPreferences() {
 		return new PlayerPreferences() {
-			modelVariantName = PlayerPrefs.GetString(PREFIX + "prefs.model")
+			modelVariantName = PlayerPrefs.GetString(PREFS_MODEL)
 		};
 	}
 
 	public static void SavePreferences(PlayerPreferences prefs) {
-		PlayerPrefs.SetString(PREFIX + "prefs.model", prefs.modelVariantName);
+		PlayerPrefs.SetString(PREFS_MODEL, prefs.modelVariantName);
 		PlayerPrefs.Save();
 	}
 

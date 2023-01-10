@@ -8,12 +8,8 @@ public class AccountManager : MonoBehaviour {
 	public static AccountManager Instance { get; private set; }
 
 	[Header("Configuration")]
+	[SerializeField] private string loginSceneName = "LoginScene";
 	[SerializeField] private string mainSceneName = "MainScene";
-
-	[Header("Debug")]
-	[SerializeField] private string _debugUser;
-	[SerializeField] private string _debugPass;
-	[SerializeField] private bool _debugMode;
 
 	public static string Token => Account.tokenAccess;
 	private static string TokenRefresh => Account.tokenRefresh;
@@ -53,6 +49,14 @@ public class AccountManager : MonoBehaviour {
 		StartCoroutine(CR_SendLogin(username, password, errorCallback, successCallback));
 	}
 
+	public void TryLogout() {
+		if(!IsLogged) {
+			Debug.LogWarning("Tried to log-out... But you're NOT logged-in !");
+			return;
+		}
+		StartCoroutine(CR_SendLogout());
+	}
+
 	private void SetLoginComplete(LoginResponse response, string username) {
 		// fill account data
 		Account = new() { accountId = "?", username = username, tokenAccess = response.access, tokenRefresh = response.refresh };
@@ -80,6 +84,22 @@ public class AccountManager : MonoBehaviour {
 			}
 		}
 	}
+	private IEnumerator CR_SendLogout() {
+		string postData = JsonUtility.ToJson(new LogoutRequest(TokenRefresh));
+		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest("/api_auth/logout/", postDataRaw, true)) {
+			yield return www.SendWebRequest();
+
+			if(www.result != UnityWebRequest.Result.Success) {
+				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
+			} else {
+				Debug.Log("LOGOUT COMPLETED !");
+				LocalData.ClearAccount();
+				Account = null;
+				SceneManager.LoadScene(loginSceneName);
+			}
+		}
+	}
 }
 
 [System.Serializable]
@@ -95,5 +115,12 @@ internal struct LoginRequest {
 	internal LoginRequest(string u, string p) {
 		username = u;
 		password = p;
+	}
+}
+[System.Serializable]
+internal struct LogoutRequest {
+	public string refresh_token;
+	internal LogoutRequest(string refresh_token) {
+		this.refresh_token = refresh_token;
 	}
 }
