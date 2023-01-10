@@ -15,11 +15,10 @@ public class AccountManager : MonoBehaviour {
 	[SerializeField] private string _debugPass;
 	[SerializeField] private bool _debugMode;
 
-
-	public static string Token { get; private set; }
-	private static string TokenRefresh { get; set; }
+	public static string Token => Account.tokenAccess;
+	private static string TokenRefresh => Account.tokenRefresh;
 	public static Account Account { get; private set; }
-	public static bool IsLogged => Token != null;
+	public static bool IsLogged => Account != null && Token != null;
 
 	public static bool IsMe(string id) {
 		return Account != null && id == Account.accountId;
@@ -37,10 +36,11 @@ public class AccountManager : MonoBehaviour {
 	}
 
 	private void Start() {
-		// DEBUG
-		if(_debugMode) {
-			Debug.LogWarning("DEBUG for AccountManager.");
-			TryLogin(_debugUser, _debugPass);
+		// try log-in directly
+		if(LocalData.HasAccount()) {
+			Account = LocalData.GetAccount();
+			Debug.Log("Data found. Username is '" + Account.username + "'.");
+			SceneManager.LoadScene(mainSceneName);
 		}
 	}
 
@@ -54,11 +54,10 @@ public class AccountManager : MonoBehaviour {
 	}
 
 	private void SetLoginComplete(LoginResponse response, string username) {
-		// Set tokens
-		Token = response.access;
-		TokenRefresh = response.refresh;
 		// fill account data
-		Account = new() { accountId = "?", username = username };
+		Account = new() { accountId = "?", username = username, tokenAccess = response.access, tokenRefresh = response.refresh };
+		LocalData.SaveAccount(Account);
+		Debug.Log("Saved local data.");
 		// Go to the main scene.
 		SceneManager.LoadScene(mainSceneName);
 	}

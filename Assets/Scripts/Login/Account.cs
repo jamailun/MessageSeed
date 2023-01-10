@@ -4,9 +4,12 @@
 [System.Serializable]
 public class Account {
 
-	public string accountId;
+	public string accountId; //TO DETERMINE
 
 	public string username;
+
+	public string tokenAccess;
+	public string tokenRefresh;
 
 	public Account() { }
 
