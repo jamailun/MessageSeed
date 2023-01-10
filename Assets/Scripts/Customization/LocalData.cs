@@ -38,19 +38,13 @@ public static class LocalData {
 		PlayerPrefs.Save();
 	}
 
-	public static PlayerPreferences GetPreferences() {
-		return new PlayerPreferences() {
-			modelVariantName = PlayerPrefs.GetString(PREFS_MODEL)
-		};
+	public static string GetPreferredModel() {
+		return PlayerPrefs.GetString(PREFS_MODEL);
 	}
 
-	public static void SavePreferences(PlayerPreferences prefs) {
-		PlayerPrefs.SetString(PREFS_MODEL, prefs.modelVariantName);
+	public static void SavePreferredModel(VariantModel model) {
+		PlayerPrefs.SetString(PREFS_MODEL, model.VariantName);
 		PlayerPrefs.Save();
-	}
-
-	public struct PlayerPreferences {
-		public string modelVariantName;
 	}
 	
 }

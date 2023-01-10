@@ -17,6 +17,7 @@ public class VariantModelUI : MonoBehaviour {
 	public void LocalClick() {
 		Debug.Log("new color : " + model.name);
 		DynamicAvatar.Instance?.ChangeColor(model);
+		LocalData.SavePreferredModel(model);
 	}
 
 }

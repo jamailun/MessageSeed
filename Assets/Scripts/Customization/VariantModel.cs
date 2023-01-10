@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "VariantModel", menuName = "MessageSeed/VariantModel", order = 1)]
+[System.Serializable]
 public class VariantModel : ScriptableObject {
 
 	[SerializeField] private Color _variantColor;
