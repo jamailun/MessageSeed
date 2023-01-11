@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Events;
 using System.Collections.Generic;
 using System.Collections;
-
-using GoMap;
 using GoShared;
 
 public class MessagesManager : MonoBehaviour {
@@ -11,6 +10,7 @@ public class MessagesManager : MonoBehaviour {
 	public static MessagesManager Instance { get; private set; }
 	[SerializeField] private bool debugData = false;
 
+	[SerializeField] private UnityEvent unauthorizedEvent;
 	[SerializeField] private NewMessagesEvent newMessagesEvent;
 
 	private readonly List<Message> messages = new();
@@ -53,7 +53,11 @@ public class MessagesManager : MonoBehaviour {
 		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/messages/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
-				Debug.LogError(www.error + ". URL=["+www.url+"] Request feedback: [" + www.downloadHandler?.text+"]");
+				Debug.LogError(www.error + ". URL=[" + www.url + "] Request feedback: [" + www.downloadHandler?.text + "]");
+				if(www.responseCode == 401) {
+					// UNAUTHORIZED
+					unauthorizedEvent?.Invoke();
+				}
 			} else {
 				string json = www.downloadHandler.text;
 				Debug.Log("Success gettin messages list : " + json);
@@ -90,7 +94,12 @@ public class MessagesManager : MonoBehaviour {
 
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
-				errorCallback?.Invoke(www.error + " : " + www.downloadHandler?.text);
+				if(www.responseCode == 401) {
+					// UNAUTHORIZED
+					unauthorizedEvent?.Invoke();
+				} else {
+					errorCallback?.Invoke(www.error + " : " + www.downloadHandler?.text);
+				}
 			} else {
 				Debug.Log("new message posted successfully !");
 				successCallback?.Invoke();
@@ -125,6 +134,6 @@ public class MessagesManager : MonoBehaviour {
 
 
 	[System.Serializable]
-	public class NewMessagesEvent : UnityEngine.Events.UnityEvent<List<Message>> { }
+	public class NewMessagesEvent : UnityEvent<List<Message>> { }
 
 }

@@ -22,8 +22,8 @@ public class MessageRaycast : MonoBehaviour {
 			Debug.DrawRay(ray.origin, ray.direction.normalized * 1500f, Color.red, 3f);
 
 			if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
-				if(hit.collider.GetComponent<MessageRenderer>() != null) {
-					MessageRenderer renderer = hit.collider.GetComponent<MessageRenderer>();
+				if(hit.collider.GetComponentInParent<MessageRenderer>() != null) {
+					MessageRenderer renderer = hit.collider.GetComponentInParent<MessageRenderer>();
 					renderer.OpenOrLoad(MessageReadyToOpen);
 				}
 			}

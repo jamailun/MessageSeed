@@ -40,6 +40,11 @@ public class AccountManager : MonoBehaviour {
 		}
 	}
 
+	public void InvalidateSession() {
+		Debug.LogWarning("Session invalidated.");
+		Account = null;
+	}
+
 
 	public void TryLogin(string username, string password, CSharpExtension.Consumable<string> errorCallback = null, CSharpExtension.Runnable successCallback = null) {
 		if(IsLogged) {
