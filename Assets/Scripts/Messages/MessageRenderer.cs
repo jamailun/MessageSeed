@@ -4,14 +4,29 @@ using UnityEngine.Networking;
 
 public class MessageRenderer : MonoBehaviour {
 
-// DEBUUUG !!!
-	[SerializeField] private Message _message;
-	private bool IsLoaded => _message.IsComplete;
+	[Header("Displays")]
+	[SerializeField] private GameObject prefab_seed;
+	[SerializeField] private GameObject prefab_bush;
+	[SerializeField] private GameObject prefab_tree;
 
-	public Message Message => _message;
+	[Header("Configuration")]
+	[SerializeField] private int startBush = 10;
+	[SerializeField] private int startTree = 50;
+
+	private int LikesAmount => Message == null ? 0 : (int) Message.likesAmount;
+	private bool IsLoaded => Message != null && Message.IsComplete;
+	public Message Message { get; private set; }
 
 	public void SetMessage(Message message) {
-		this._message = message;
+		Message = message;
+		UpdateChild();
+	}
+
+	private void UpdateChild() {
+		transform.DestroyChildren();
+		var prefab = LikesAmount >= startTree ? prefab_tree : LikesAmount >= startBush ? prefab_bush : prefab_seed;
+		var child = Instantiate(prefab, transform);
+		child.transform.localPosition = Vector3.zero;
 	}
 
 	public void OpenOrLoad(CSharpExtension.Consumable<Message> callback) {
@@ -37,6 +52,7 @@ public class MessageRenderer : MonoBehaviour {
 				Message.Complete(messageComplete);
 				Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete+"\n"+www.downloadHandler.text);
 				callback?.Invoke(Message);
+				UpdateChild();
 			}
 		}
 	}

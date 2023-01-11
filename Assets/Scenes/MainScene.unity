@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locationManager: {fileID: 1438148982}
-  tileBuffer: 0
+  tileBuffer: 1
   zoomLevel: 14
   useCache: 1
   clearCache: 0
