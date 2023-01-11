@@ -13,7 +13,7 @@ public class MessageRenderer : MonoBehaviour {
 	[SerializeField] private int startBush = 10;
 	[SerializeField] private int startTree = 50;
 
-	private int LikesAmount => Message == null ? 0 : (int) Message.likesAmount;
+	private int LikesAmount => Message == null ? 0 : Message.LikesAmount;
 	private bool IsLoaded => Message != null && Message.IsComplete;
 	public Message Message { get; private set; }
 
