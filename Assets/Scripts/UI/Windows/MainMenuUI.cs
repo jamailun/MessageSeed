@@ -8,8 +8,11 @@ public class MainMenuUI : MonoBehaviour {
 
 	private readonly List<MainMenuWindowUI> windows = new();
 
+	[SerializeField] private LogoutUI logoutUI;
+	[SerializeField] private DisconnectedUI disconnectedUI;
+
 	public bool IsSomethingOpen() {
-		return state != State.DEFAULT;
+		return state != State.DEFAULT || logoutUI.isActiveAndEnabled || disconnectedUI.isActiveAndEnabled;
 	}
 
 	private void Start() {
