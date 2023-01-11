@@ -1,38 +1,29 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using GoShared;
 
 [System.Serializable]
 public class Message {
 
-	public MessageHeader header;
+	private MessageHeader header;
 	public bool IsComplete { get; private set; }
+
+	// General
 	public string AuthorId => header.AuthorId;
 	public string MessageId => header.id;
-
-	public string messageTitle;
-	public string messageContent;
-
-	public string authorName;
-
-	public long deathTime; // timecode of the death
-	public long likesAmount;
-
-	public GoShared.Coordinates Coordinates => header.Coordinates;
+	public string AuthorName { get; private set; }
+	public string MessageTitle { get; private set; }
+	public string MessageContent { get; private set; }
+	// Times
+	public DateTime CreationTime { get; private set; }
+	public DateTime DeathTime { get; private set; }
+	// Likes
+	public int LikesAmount { get; private set; }
+	public bool WasMessageLiked { get; private set; }//  => true; // TODO !!
+	// Other
+	public Coordinates Coordinates => header.Coordinates;
 
 	public Color MessageColor => AccountManager.IsMe(header.AuthorId) ? Color.yellow : Color.blue;
-
-	// DEBUG constructor
-	private Message(string id, string author, string t, string c, Coordinates center) {
-		this.header = new() { id = id, author = author };
-		authorName = author;
-		messageTitle = t;
-		messageContent = c;
-		IsComplete = true;
-
-		Vector2 delta = Random.insideUnitCircle * 0.0005f;
-		header.latitude = center.latitude + (double) delta.x;
-		header.longitude = center.longitude + (double) delta.y;
-	}
 
 	public Message(MessageHeader header) {
 		this.header = header;
@@ -44,21 +35,28 @@ public class Message {
 			Debug.LogError("Tried to complete message " + this + " with " + message + ", but it was already completed !");
 			return;
 		}
-		authorName = message.author_name;
-		messageTitle = message.title;
-		messageContent = message.message;
-		likesAmount = message.likes_count;
+		AuthorName = message.author_name;
+		MessageTitle = message.title;
+		MessageContent = message.message;
+
+		CreationTime = TimeUtils.UnixTimeStampToDateTime(message.unix_post_date);
+		DeathTime = TimeUtils.UnixTimeStampToDateTime(message.unix_death_date);
+
+		LikesAmount = message.like_count;
+		WasMessageLiked = false;
+
 		IsComplete = true;
+	}
+
+	public void SetAsLiked() {
+		LikesAmount++;
+		WasMessageLiked = true;
 	}
 
 	public bool ExistsOnServer => header.id != null;
 
-	public static Message DebugMessage(int i, Coordinates center) {
-		return new("test_" + i, "AUTHOR_TEST", "TEST_" + i, "Message de test n°" + i + ".", center);
-	}
-
 	public override string ToString() {
-		return "MSG{" + MessageId + ", title=" + messageTitle + ", pos=" + Coordinates + "}";
+		return "MSG{" + MessageId + ", title=" + MessageTitle + ", pos=" + Coordinates + "}";
 	}
 
 }
@@ -94,10 +92,10 @@ public struct MessageComplete {
 	public double unix_post_date;
 	public double unix_death_date;
 	public string author_name;
-	public int likes_count;
+	public int like_count;
 
 	public override string ToString() {
-		return "MessageComplete{'" + title + "', auth=" + author_name + ", likes=" + likes_count + "}";
+		return "MessageComplete{'" + title + "', auth=" + author_name + ", likes=" + like_count + "}";
 	}
 }
 

@@ -33,6 +33,11 @@ public class RemoteApiManager : MonoBehaviour {
 	public UnityWebRequest CreateAuthGetRequest(string url) {
 		return AuthenticateRequest(UnityWebRequest.Get(GetUrl(url)));
 	}
+	public UnityWebRequest CreateAuthPutRequest(string url) {
+		var www = UnityWebRequest.Get(GetUrl(url));
+		www.method = "PUT";
+		return AuthenticateRequest(www);
+	}
 
 	public UnityWebRequest AuthenticateRequest(UnityWebRequest request) {
 		if(!AccountManager.IsLogged) {

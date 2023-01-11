@@ -8,7 +8,6 @@ using GoShared;
 public class MessagesManager : MonoBehaviour {
 
 	public static MessagesManager Instance { get; private set; }
-	[SerializeField] private bool debugData = false;
 
 	[SerializeField] private UnityEvent unauthorizedEvent;
 	[SerializeField] private NewMessagesEvent newMessagesEvent;
@@ -33,19 +32,6 @@ public class MessagesManager : MonoBehaviour {
 		if(callingServer)
 			return;
 		callingServer = true;
-		if(debugData) {
-			Debug.LogWarning("DEBUG mode for MessagesManager. Debug data will be provided.");
-			if(messages.Count == 0) {
-				messages.Add(Message.DebugMessage(1, coordinates));
-				messages.Add(Message.DebugMessage(2, coordinates));
-				messages.Add(Message.DebugMessage(3, coordinates));
-				messages.Add(Message.DebugMessage(4, coordinates));
-			}
-			newMessagesEvent?.Invoke(messages);
-			callingServer = false;
-			return;
-		}
-		// Normal
 		StartCoroutine(CR_UpdateMessagesRequest());
 	}
 
@@ -113,6 +99,29 @@ public class MessagesManager : MonoBehaviour {
 
 				Debug.Log("created new message " +msg);
 				newMessagesEvent?.Invoke(CSharpExtension.AsList(msg));
+			}
+		}
+	}
+
+	public void LikeMessage(MessageDisplay owner) {
+		StartCoroutine(CR_LikeMessage(owner));
+	}
+
+	private IEnumerator CR_LikeMessage(MessageDisplay owner) {
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthPutRequest("/database/message/" + owner.Message.MessageId + "/like")) {
+			yield return www.SendWebRequest();
+
+			if(www.result != UnityWebRequest.Result.Success) {
+				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
+				owner.EndOfLikeProcess();
+				if(www.responseCode == 401) {
+					// UNAUTHORIZED
+					unauthorizedEvent?.Invoke();
+				}
+			} else {
+				Debug.Log("Liked message successfully !");
+				owner.Message.SetAsLiked();
+				owner.EndOfLikeProcess();
 			}
 		}
 	}
