@@ -102,7 +102,7 @@ public class AccountManager : MonoBehaviour {
 	private IEnumerator CR_SendSignIn(string user, string mail, string password, CSharpExtension.Consumable<string> errorCallback) {
 		string postData = JsonUtility.ToJson(new SignInRequest(user, mail, password));
 		byte[] postDataRaw = System.Text.Encoding.UTF8.GetBytes(postData);
-		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest("/api_auth/login/", postDataRaw)) {
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreatePostRequest("/api_auth/register/", postDataRaw)) {
 			yield return www.SendWebRequest();
 
 			if(www.result != UnityWebRequest.Result.Success) {
@@ -145,7 +145,6 @@ internal struct SignInResponse {
 	public string username;
 	public string email;
 }
-
 
 [System.Serializable]
 internal struct LoginRequest {
