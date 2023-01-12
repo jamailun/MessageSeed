@@ -10,6 +10,7 @@ public class AccountManager : MonoBehaviour {
 	[Header("Configuration")]
 	[SerializeField] private string loginSceneName = "LoginScene";
 	[SerializeField] private string mainSceneName = "MainScene";
+	[SerializeField] private ServerUnreachableUI unreachableUi;
 
 	public static string Token => Account.tokenAccess;
 	private static string TokenRefresh => Account.tokenRefresh;
@@ -34,9 +35,19 @@ public class AccountManager : MonoBehaviour {
 	private void Start() {
 		// try log-in directly
 		if(LocalData.HasAccount()) {
-			Account = LocalData.GetAccount();
-			Debug.Log("Data found. Username is '" + Account.username + "'.");
-			SceneManager.LoadScene(mainSceneName);
+			//TODO display loading!
+			var account = LocalData.GetAccount();
+			Debug.Log("Data found. Username is '" + account.username + "'. Start validity test.");
+			TryGetProfile(
+				p => {
+					// profile obtained successfully. It means token is valid.
+					Account = account;
+					SceneManager.LoadScene(mainSceneName);
+				}, code => {
+					// token invalid ? so it's ok, we do nothing.
+				},
+				account.tokenAccess
+			);
 		}
 	}
 
@@ -44,7 +55,6 @@ public class AccountManager : MonoBehaviour {
 		Debug.LogWarning("Session invalidated.");
 		Account = null;
 	}
-
 
 	public void TryLogin(string username, string password, CSharpExtension.Consumable<string> errorCallback = null) {
 		if(IsLogged) {
@@ -62,6 +72,10 @@ public class AccountManager : MonoBehaviour {
 			return;
 		}
 		StartCoroutine(CR_SendSignIn(username, mail, password, errorCallback));
+	}
+
+	public void TryGetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, string differentToken = null) {
+		StartCoroutine(CR_GetProfile(success, error, differentToken));
 	}
 
 	public void TryLogout() {
@@ -132,6 +146,26 @@ public class AccountManager : MonoBehaviour {
 			}
 		}
 	}
+
+	private IEnumerator CR_GetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, string differentToken = null) {
+		differentToken ??= Token;
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/profile/", differentToken)) {
+			yield return www.SendWebRequest();
+
+			if(www.result != UnityWebRequest.Result.Success) {
+				Debug.LogError("[GETTING PROFILE] ("+www.responseCode+")" + www.error + " : " + www.downloadHandler?.text);
+				error?.Invoke((int)www.responseCode);
+			} else {
+				var profile = JsonUtility.FromJson<ProfileResponse>(www.downloadHandler.text);
+				success?.Invoke(profile);
+			}
+		}
+	}
+}
+
+[System.Serializable]
+public struct ProfileResponse {
+	//TODO
 }
 
 [System.Serializable]

@@ -79,9 +79,9 @@ public class MessageDisplay : MonoBehaviour {
 		if(span.TotalSeconds < 0)
 			return "invalid date.";
 		string s = "";
-		if(span.TotalDays > 0)
+		if(span.TotalDays >= 1)
 			s += span.Days + " day" + (span.Days > 1 ? "s" : "") + ", ";
-		if(span.TotalHours > 0)
+		if(span.TotalHours >= 1)
 			s += span.Hours + " hour" + (span.Hours > 1 ? "s" : "") + " and ";
 		s += span.Minutes + " minute" + (span.Minutes > 1 ? "s" : "") + ".";
 		return s;
