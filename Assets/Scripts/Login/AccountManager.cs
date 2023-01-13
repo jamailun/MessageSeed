@@ -49,7 +49,7 @@ public class AccountManager : MonoBehaviour {
 					Debug.LogWarning("Token invalid : " + code);
 					// token invalid ? so it's ok, we do nothing.
 				},
-				account.tokenAccess
+				account
 			);
 		}
 	}
@@ -77,8 +77,8 @@ public class AccountManager : MonoBehaviour {
 		StartCoroutine(CR_SendSignIn(username, mail, password, errorCallback));
 	}
 
-	public void TryGetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, string differentToken = null) {
-		StartCoroutine(CR_GetProfile(success, error, differentToken));
+	public void TryGetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, Account differenceAccount = null) {
+		StartCoroutine(CR_GetProfile(success, error, differenceAccount));
 	}
 
 	public void TryLogout() {
@@ -154,9 +154,9 @@ public class AccountManager : MonoBehaviour {
 		}
 	}
 
-	private IEnumerator CR_GetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, string differentToken = null) {
-		differentToken ??= Token;
-		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/profile/", differentToken)) {
+	private IEnumerator CR_GetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, Account differentAccount = null) {
+		differentAccount ??= Account;
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/profile/", differentAccount.tokenAccess)) {
 			yield return www.SendWebRequest();
 
 			if(www.result != UnityWebRequest.Result.Success) {
@@ -164,6 +164,7 @@ public class AccountManager : MonoBehaviour {
 				error?.Invoke((int)www.responseCode);
 			} else {
 				var profile = JsonUtility.FromJson<ProfileResponse>(www.downloadHandler.text);
+				differentAccount.accountId = profile.user_id;
 				success?.Invoke(profile);
 			}
 		}
