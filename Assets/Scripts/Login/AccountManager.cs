@@ -41,9 +41,11 @@ public class AccountManager : MonoBehaviour {
 			TryGetProfile(
 				p => {
 					// profile obtained successfully. It means token is valid.
+					Debug.Log("Success : loading main scene");
 					Account = account;
 					SceneManager.LoadScene(mainSceneName);
 				}, code => {
+					Debug.LogWarning("Token invalid : " + code);
 					// token invalid ? so it's ok, we do nothing.
 				},
 				account.tokenAccess
@@ -165,7 +167,14 @@ public class AccountManager : MonoBehaviour {
 
 [System.Serializable]
 public struct ProfileResponse {
-	//TODO
+	public string user_id;
+	public string author_name;
+	public int level;
+	public int experience;
+	public int[] messages;
+	public int[] messages_liked;
+	public int likes_received_total;
+	public int likes_given_total;
 }
 
 [System.Serializable]
