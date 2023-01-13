@@ -5,6 +5,7 @@ public class MainMenuUI : MonoBehaviour {
 
 	private State state = State.DEFAULT;
 	private MainMenuWindowUI subPanelOpen;
+	private MainMenuWindowUI subSubPanelOpen;
 
 	private readonly List<MainMenuWindowUI> windows = new();
 
@@ -26,6 +27,16 @@ public class MainMenuUI : MonoBehaviour {
 		TriggerHandleOpen(newState, target);
 	}
 
+	// c'est IMMONDE mais j'ai pas le temps de faire mieux désolé
+	public void OpenSubSubPanel(MainMenuWindowUI panel) {
+		if(subSubPanelOpen) {
+			subSubPanelOpen.Close();
+		}
+		subSubPanelOpen = panel;
+		if(panel)
+			panel.Open();
+	}
+
 	// Called by events
 	public void OpenSubPanel(MainMenuWindowUI panel) {
 		if(subPanelOpen) {
@@ -36,14 +47,31 @@ public class MainMenuUI : MonoBehaviour {
 			panel.Open();
 	}
 
+	public void CloseOnTop() {
+		if(subSubPanelOpen) {
+			subSubPanelOpen.Close();
+			subSubPanelOpen = null;
+		} else if(subPanelOpen) {
+			subPanelOpen.Close();
+			subPanelOpen = null;
+		} else {
+			CloseEverything();
+		}
+	}
+
 	public void CloseEverything() {
 		foreach(var w in windows)
 			w.Close();
 		state = State.DEFAULT;
+		subPanelOpen = null;
+		subSubPanelOpen = null;
 	}
 
 	public void CloseSubPanel() {
-		if(subPanelOpen) {
+		if(subSubPanelOpen) {
+			subSubPanelOpen.Close();
+			subSubPanelOpen = null;
+		} else if(subPanelOpen) {
 			subPanelOpen.Close();
 			subPanelOpen = null;
 		}

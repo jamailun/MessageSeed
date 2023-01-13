@@ -247,16 +247,3 @@ internal struct LogoutRequest {
 		this.refresh_token = refresh_token;
 	}
 }
-
-
-[System.Serializable]
-public struct MessageListSerializer {
-	public string title;
-	public int likes_count;
-	public int state;
-}
-[System.Serializable]
-public struct MessageListSerializerList {
-	public string user_id;
-	public MessageListSerializer[] my_messages;
-}

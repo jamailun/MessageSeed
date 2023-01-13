@@ -19,6 +19,7 @@ public class ProfileDisplayUI : MainMenuWindowUI {
 	[SerializeField] private RectTransform linesContainer;
 	[SerializeField] private MessageLineUI linePrefab;
 	[SerializeField] private GameObject emptyMessage;
+	public MessageRaycast.MessageOpenedEvent messageOpenEvent;
 
 	public void UpdateProfile() {
 		// Global profile
