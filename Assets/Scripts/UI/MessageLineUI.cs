@@ -25,8 +25,8 @@ public class MessageLineUI : MonoBehaviour {
 		_message = new Message(msg);
 		// display
 		title.text = msg.title;
-		water.text = msg.likes_count + "";
-		icon.sprite = GetIcon(msg.likes_count);
+		water.text = msg.like_count + "";
+		icon.sprite = GetIcon(msg.like_count);
 	}
 
 	private Sprite GetIcon(int state) {

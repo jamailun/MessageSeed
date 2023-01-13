@@ -20,7 +20,7 @@ public class Message {
 	public DateTime DeathTime { get; private set; }
 	// Likes
 	public int LikesAmount { get; private set; }
-	public bool WasMessageLiked { get; private set; }//  => true; // TODO !!
+	public bool WasMessageLiked { get; private set; }
 	// Other
 	public Coordinates Coordinates => header.Coordinates;
 
@@ -49,7 +49,7 @@ public class Message {
 		DeathTime = TimeUtils.UnixTimeStampToDateTime(message.unix_death_date);
 
 		LikesAmount = message.like_count;
-		WasMessageLiked = false;
+		WasMessageLiked = message.me_liked;
 
 		IsComplete = true;
 	}
@@ -140,7 +140,7 @@ public struct MessageListSerializer {
 	public string title;
 	public string message;
 	public string author_name;
-	public int likes_count;
+	public int like_count;
 	public double unix_post_date;
 	public double unix_death_date;
 	public bool me_liked;
@@ -158,7 +158,7 @@ public struct MessageListSerializer {
 	public MessageComplete ToComplete() {
 		return new MessageComplete() {
 			author_name = author_name,
-			like_count = likes_count,
+			like_count = like_count,
 			message = message,
 			title = title,
 			me_liked = me_liked,

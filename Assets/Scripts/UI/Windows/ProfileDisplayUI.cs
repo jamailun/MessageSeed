@@ -13,7 +13,6 @@ public class ProfileDisplayUI : MainMenuWindowUI {
 
 	[SerializeField] private TMP_Text likesReceivedField;
 	[SerializeField] private TMP_Text likesGivenField;
-	[SerializeField] private TMP_Text mostLikedMessage;
 
 	[Header("Message list")]
 	[SerializeField] private RectTransform linesContainer;
@@ -37,12 +36,6 @@ public class ProfileDisplayUI : MainMenuWindowUI {
 
 		likesReceivedField.text = profile.likes_received_total + "";
 		likesGivenField.text = profile.likes_received_total + "";
-
-		if(profile.most_liked_message_id == null) {
-			mostLikedMessage.text = "none :(";
-		} else {
-			mostLikedMessage.text = "#" + profile.most_liked_message_id + " (" + profile.most_liked_message_count + ")";
-		}
 	}
 
 	private void ProfileFailed(int errCode) {
@@ -58,13 +51,14 @@ public class ProfileDisplayUI : MainMenuWindowUI {
 			emptyMessage.SetActive(true);
 			return;
 		}
-		bool isEmpty = true;
+		// to list
+		var list = new List<MessageListSerializer>(msgs);
+		emptyMessage.SetActive(list.Count == 0);
+		list.Sort((a, b) => a.like_count - b.like_count);
 		foreach(var msg in msgs) {
 			var line = Instantiate(linePrefab, linesContainer);
 			line.SetData(msg);
-			isEmpty = false;
 		}
-		emptyMessage.SetActive(isEmpty);
 	}
 
 }

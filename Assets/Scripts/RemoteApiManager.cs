@@ -24,7 +24,8 @@ public class RemoteApiManager : MonoBehaviour {
 	private void Start() {
 		StartCoroutine(CR_PingServer(
 			() => {
-				SceneManager.LoadScene("LoginScene");
+				if(SceneManager.GetActiveScene().name != "MainScene")
+					SceneManager.LoadScene("LoginScene");
 			},
 			err => {
 				unreachableUI.gameObject.SetActive(true);
