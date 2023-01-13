@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
@@ -41,12 +42,14 @@ public class AccountManager : MonoBehaviour {
 			TryGetProfile(
 				p => {
 					// profile obtained successfully. It means token is valid.
+					Debug.Log("Success : loading main scene");
 					Account = account;
 					SceneManager.LoadScene(mainSceneName);
 				}, code => {
+					Debug.LogWarning("Token invalid : " + code);
 					// token invalid ? so it's ok, we do nothing.
 				},
-				account.tokenAccess
+				account
 			);
 		}
 	}
@@ -74,8 +77,8 @@ public class AccountManager : MonoBehaviour {
 		StartCoroutine(CR_SendSignIn(username, mail, password, errorCallback));
 	}
 
-	public void TryGetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, string differentToken = null) {
-		StartCoroutine(CR_GetProfile(success, error, differentToken));
+	public void TryGetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, Account differenceAccount = null) {
+		StartCoroutine(CR_GetProfile(success, error, differenceAccount));
 	}
 
 	public void TryLogout() {
@@ -84,6 +87,10 @@ public class AccountManager : MonoBehaviour {
 			return;
 		}
 		StartCoroutine(CR_SendLogout());
+	}
+
+	public void TryGetMyMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
+		StartCoroutine(CR_GetMyMessagesList(success));
 	}
 
 	private void SetLoginComplete(LoginResponse response, string username) {
@@ -147,9 +154,9 @@ public class AccountManager : MonoBehaviour {
 		}
 	}
 
-	private IEnumerator CR_GetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, string differentToken = null) {
-		differentToken ??= Token;
-		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/profile/", differentToken)) {
+	private IEnumerator CR_GetProfile(CSharpExtension.Consumable<ProfileResponse> success, CSharpExtension.Consumable<int> error, Account differentAccount = null) {
+		differentAccount ??= Account;
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/profile/", differentAccount.tokenAccess)) {
 			yield return www.SendWebRequest();
 
 			if(www.result != UnityWebRequest.Result.Success) {
@@ -157,7 +164,22 @@ public class AccountManager : MonoBehaviour {
 				error?.Invoke((int)www.responseCode);
 			} else {
 				var profile = JsonUtility.FromJson<ProfileResponse>(www.downloadHandler.text);
+				differentAccount.accountId = profile.user_id;
 				success?.Invoke(profile);
+			}
+		}
+	}
+
+	private IEnumerator CR_GetMyMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/profile/messages/")) {
+			yield return www.SendWebRequest();
+
+			if(www.result != UnityWebRequest.Result.Success) {
+				Debug.LogError("[GETTING MSG LIST] (" + www.responseCode + ")" + www.error + " : " + www.downloadHandler?.text);
+			} else {
+				Debug.LogWarning("list of MY messages : " + www.downloadHandler.text);
+				var list = JsonUtility.FromJson<MessageListSerializerList>(www.downloadHandler.text);
+				success?.Invoke(list.my_messages);
 			}
 		}
 	}
@@ -165,7 +187,18 @@ public class AccountManager : MonoBehaviour {
 
 [System.Serializable]
 public struct ProfileResponse {
-	//TODO
+	public string user_id;
+	public string author_name;
+	// exp
+	public double level;
+	public double experience;
+	public double experience_next;
+	public double experience_previous;
+	// stats
+	public int likes_received_total;
+	public int likes_given_total;
+	public int most_liked_message_count;
+	public string most_liked_message_id;
 }
 
 [System.Serializable]

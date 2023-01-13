@@ -24,6 +24,10 @@ public static class CSharpExtension {
 		return l;
 	}
 
+	public static string WrapJsonToClass(string source, string topClass) {
+		return string.Format("{{ \"{0}\": {1}}}", topClass, source);
+	}
+
 	/// <summary>
 	/// Get or add a component on a gameobject.
 	/// </summary>

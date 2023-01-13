@@ -71,7 +71,7 @@ public class MessageDisplay : MonoBehaviour {
 
 		// Likes
 		likesField.text = DisplayLikes(Message.LikesAmount);
-		likeButton.interactable = ! Message.WasMessageLiked;
+		likeButton.interactable = (! Message.WasMessageLiked) && (Message.AuthorId != AccountManager.Account.accountId);
 		likeImage.color = Message.WasMessageLiked ? colorLiked : colorNotLiked;
 	}
 

@@ -9,11 +9,6 @@ public class MessageRenderer : MonoBehaviour {
 	[SerializeField] private GameObject prefab_bush;
 	[SerializeField] private GameObject prefab_tree;
 
-	[Header("Configuration")]
-	[SerializeField] private int startBush = 10;
-	[SerializeField] private int startTree = 50;
-
-	private int LikesAmount => Message == null ? 0 : Message.LikesAmount;
 	private bool IsLoaded => Message != null && Message.IsComplete;
 	public Message Message { get; private set; }
 
@@ -24,7 +19,16 @@ public class MessageRenderer : MonoBehaviour {
 
 	private void UpdateChild() {
 		transform.DestroyChildren();
-		var prefab = LikesAmount >= startTree ? prefab_tree : LikesAmount >= startBush ? prefab_bush : prefab_seed;
+		var prefab = Message.State switch {
+			MessageState.Seed => prefab_seed,
+			MessageState.Sapling => prefab_bush,
+			MessageState.Tree => prefab_tree,
+			_ => null
+		};
+		if(prefab == null) {
+			Debug.LogError("Unexpected State for message " + Message + " : " + Message.State);
+			return;
+		}
 		var child = Instantiate(prefab, transform);
 		child.transform.localPosition = Vector3.zero;
 	}
