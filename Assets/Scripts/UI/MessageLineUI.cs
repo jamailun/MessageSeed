@@ -21,11 +21,10 @@ public class MessageLineUI : MonoBehaviour {
 
 	private Sprite GetIcon(int state) {
 		return (state) switch {
-			1 => iconDead,
-			2 => iconSeed,
-			3 => iconSapling,
-			4 => iconTree,
-			_ => iconTree
+			0 => iconSeed,
+			1 => iconSapling,
+			2 => iconTree,
+			_ => iconDead
 		};
 	}
 

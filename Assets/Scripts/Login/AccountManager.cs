@@ -89,8 +89,8 @@ public class AccountManager : MonoBehaviour {
 		StartCoroutine(CR_SendLogout());
 	}
 
-	public void TryGetMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
-		StartCoroutine(CR_GetMessagesList(success));
+	public void TryGetMyMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
+		StartCoroutine(CR_GetMyMessagesList(success));
 	}
 
 	private void SetLoginComplete(LoginResponse response, string username) {
@@ -169,16 +169,16 @@ public class AccountManager : MonoBehaviour {
 		}
 	}
 
-	private IEnumerator CR_GetMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
-		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/messages/")) {
+	private IEnumerator CR_GetMyMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/profile/messages/")) {
 			yield return www.SendWebRequest();
 
 			if(www.result != UnityWebRequest.Result.Success) {
 				Debug.LogError("[GETTING MSG LIST] (" + www.responseCode + ")" + www.error + " : " + www.downloadHandler?.text);
 			} else {
-				string jsonWrapped = CSharpExtension.WrapJsonToClass(www.downloadHandler.text, "list");
-				var list = JsonUtility.FromJson<MessageListSerializerList>(jsonWrapped);
-				success?.Invoke(list.list);
+				Debug.LogWarning("list of MY messages : " + www.downloadHandler.text);
+				var list = JsonUtility.FromJson<MessageListSerializerList>(www.downloadHandler.text);
+				success?.Invoke(list.my_messages);
 			}
 		}
 	}
@@ -188,12 +188,16 @@ public class AccountManager : MonoBehaviour {
 public struct ProfileResponse {
 	public string user_id;
 	public string author_name;
-	public int level;
-	public int experience;
-	public int[] messages;
-	public int[] messages_liked;
+	// exp
+	public double level;
+	public double experience;
+	public double experience_next;
+	public double experience_previous;
+	// stats
 	public int likes_received_total;
 	public int likes_given_total;
+	public int most_liked_message_count;
+	public string most_liked_message_id;
 }
 
 [System.Serializable]
@@ -253,5 +257,6 @@ public struct MessageListSerializer {
 }
 [System.Serializable]
 public struct MessageListSerializerList {
-	public MessageListSerializer[] list;
+	public string user_id;
+	public MessageListSerializer[] my_messages;
 }
