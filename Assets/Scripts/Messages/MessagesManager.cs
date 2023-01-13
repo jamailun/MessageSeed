@@ -49,7 +49,7 @@ public class MessagesManager : MonoBehaviour {
 				Debug.Log("Success gettin messages list : " + json);
 
 				// Unity CANNOT handle [{}...]. It needs to be wrapped as {list:[{}...]}
-				string jsonWrapped = WrapJsonToClass(json, "list");
+				string jsonWrapped = CSharpExtension.WrapJsonToClass(json, "list");
 				var headers = JsonUtility.FromJson<MessagesHeaderList>(jsonWrapped);
 
 				foreach(var header in headers.list) {
@@ -60,10 +60,6 @@ public class MessagesManager : MonoBehaviour {
 			}
 			callingServer = false;
 		}
-	}
-
-	private static string WrapJsonToClass(string source, string topClass) {
-		return string.Format("{{ \"{0}\": {1}}}", topClass, source);
 	}
 
 	public void WriteMessage(string title, string content, CSharpExtension.Consumable<string> errorCallback, CSharpExtension.Runnable callback) {

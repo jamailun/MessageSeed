@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
@@ -88,6 +89,10 @@ public class AccountManager : MonoBehaviour {
 		StartCoroutine(CR_SendLogout());
 	}
 
+	public void TryGetMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
+		StartCoroutine(CR_GetMessagesList(success));
+	}
+
 	private void SetLoginComplete(LoginResponse response, string username) {
 		// fill account data
 		Account = new() { accountId = "?", username = username, tokenAccess = response.access, tokenRefresh = response.refresh };
@@ -163,6 +168,20 @@ public class AccountManager : MonoBehaviour {
 			}
 		}
 	}
+
+	private IEnumerator CR_GetMessagesList(CSharpExtension.Consumable<IEnumerable<MessageListSerializer>> success) {
+		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/messages/")) {
+			yield return www.SendWebRequest();
+
+			if(www.result != UnityWebRequest.Result.Success) {
+				Debug.LogError("[GETTING MSG LIST] (" + www.responseCode + ")" + www.error + " : " + www.downloadHandler?.text);
+			} else {
+				string jsonWrapped = CSharpExtension.WrapJsonToClass(www.downloadHandler.text, "list");
+				var list = JsonUtility.FromJson<MessageListSerializerList>(jsonWrapped);
+				success?.Invoke(list.list);
+			}
+		}
+	}
 }
 
 [System.Serializable]
@@ -223,4 +242,16 @@ internal struct LogoutRequest {
 	internal LogoutRequest(string refresh_token) {
 		this.refresh_token = refresh_token;
 	}
+}
+
+
+[System.Serializable]
+public struct MessageListSerializer {
+	public string title;
+	public int likes_count;
+	public int state;
+}
+[System.Serializable]
+public struct MessageListSerializerList {
+	public MessageListSerializer[] list;
 }
