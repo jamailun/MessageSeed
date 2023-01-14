@@ -38,8 +38,7 @@ public class Message {
 
 	public void Complete(MessageComplete message) {
 		if(IsComplete) {
-			Debug.LogError("Tried to complete message " + this + " with " + message + ", but it was already completed !");
-			return;
+			Debug.LogWarning("Tried to complete message " + this + " with " + message + ", but it was already completed !");
 		}
 		AuthorName = message.author_name;
 		MessageTitle = message.title;

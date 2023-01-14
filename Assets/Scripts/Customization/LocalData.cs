@@ -10,6 +10,9 @@ public static class LocalData {
 
 	private const string PREFS_MODEL = PREFIX + "prefs.model";
 	private const string PREFS_SKY = PREFIX + "prefs.sky";
+	private const string PREFS_SIZES_AVATAR = PREFIX + "prefs.sizes.avatar";
+	private const string PREFS_SIZES_MESSAGES = PREFIX + "prefs.sizes.messages";
+	private const string PREFS_SIZES_BUFFER = PREFIX + "prefs.sizes.buffer";
 
 	public static bool HasAccount() {
 		return PlayerPrefs.HasKey(USERNAME)
@@ -53,6 +56,23 @@ public static class LocalData {
 	public static void SavePreferredSky(VariantSky model) {
 		PlayerPrefs.SetString(PREFS_SKY, model.VariantName);
 		PlayerPrefs.Save();
+	}
+
+	public static void SaveSizes(float avatar, float messages, int buffer) {
+		PlayerPrefs.SetFloat(PREFS_SIZES_AVATAR, avatar);
+		PlayerPrefs.SetFloat(PREFS_SIZES_MESSAGES, messages);
+		PlayerPrefs.SetInt(PREFS_SIZES_BUFFER, buffer);
+		PlayerPrefs.Save();
+	}
+
+	public static float GetSizeAvatar() {
+		return PlayerPrefs.GetFloat(PREFS_SIZES_AVATAR, 1f);
+	}
+	public static float GetSizeMessages() {
+		return PlayerPrefs.GetFloat(PREFS_SIZES_MESSAGES, 1f);
+	}
+	public static int GetSizeBuffer() {
+		return PlayerPrefs.GetInt(PREFS_SIZES_BUFFER, 1);
 	}
 
 }
