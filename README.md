@@ -1,5 +1,7 @@
 # MessageSeed
 
+![Background image](https://github.com/jamailun/MessageSeed/blob/main/.github/bg.png?raw=true)
+
 ## Context
 
 Real world interactive systems class, from Keio University, Fall 2022.
@@ -15,3 +17,7 @@ This project also use the (server repository)[https://github.com/JackyL56/Messag
 - Timothé Rosaz _(UNITY client developer, server provider)_,
 - Jacky Liu _(backend developer)_,
 - Isabella Grossart _(design)_.
+
+### Captures
+
+![App in use](https://github.com/jamailun/MessageSeed/blob/main/.github/phone_1.png?raw=true) ![Posting a new messgae](https://github.com/jamailun/MessageSeed/blob/main/.github/phone_2.png?raw=true)
