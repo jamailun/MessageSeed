@@ -10,6 +10,8 @@ public class NewMessagePanel : MonoBehaviour {
 	[SerializeField] private Button saveButton;
 	[SerializeField] private UnityEvent afterSaveEvent;
 
+	[SerializeField] private AlertUI alertUI;
+
 	private void Start() {
 		saveButton.interactable = true;
 	}
@@ -25,7 +27,7 @@ public class NewMessagePanel : MonoBehaviour {
 		if(error != null) {
 			Debug.LogError("Validation error : " + error);
 			saveButton.interactable = true;
-			//TODO diusplay error to UI
+			alertUI.Open(error);
 			return;
 		}
 
@@ -36,7 +38,9 @@ public class NewMessagePanel : MonoBehaviour {
 
 	private void MessageSendingError(string error) {
 		Debug.LogError("ERROR : could NOT send message. Error is \"" + error + "\".");
+		alertUI.Open(error);
 	}
+
 	private void MessageSendingOver() {
 		// clear
 		headerInput.text = "";
@@ -46,17 +50,15 @@ public class NewMessagePanel : MonoBehaviour {
 		saveButton.interactable = true;
 	}
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="header"></param>
-	/// <param name="content"></param>
-	/// <returns></returns>
 	private string Validate(string header, string content) {
-		if(header.Length < 5)
+		if(header.Length < 3)
 			return "Message title is too short";
-		if(content.Length < 5)
+		if(header.Length > 35)
+			return "Message title is too long";
+		if(content.Length < 3)
 			return "Message content is too short";
+		if(content.Length > 1000)
+			return "Message content is too long";
 		// More validations
 		return null;
 	}

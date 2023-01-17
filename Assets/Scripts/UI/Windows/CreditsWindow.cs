@@ -9,6 +9,7 @@ public class CreditsWindow : MainMenuWindowUI {
 	public void Button_Client() {
 		Application.OpenURL(clientUrl);
 	}
+
 	public void Button_Server() {
 		Application.OpenURL(serverUrl);
 	}
