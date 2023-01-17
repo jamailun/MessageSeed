@@ -46,10 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab_seed: {fileID: 5868843765078513787, guid: 062f75906dcd61949a848abbdf3c29a3, type: 3}
-  prefab_bush: {fileID: 8776418244539869002, guid: 5fc546c13eaed804fa1a355dc09fdb58, type: 3}
-  prefab_tree: {fileID: 8922926487258271721, guid: 6b30c874e079d65448b8f281531cd388, type: 3}
-  startBush: 10
-  startTree: 50
+  prefab_bush: {fileID: 5868843765078513787, guid: ee8dc639256e9e24aa831ca209bb071c, type: 3}
+  prefab_tree: {fileID: 8776418244539869002, guid: 5fc546c13eaed804fa1a355dc09fdb58, type: 3}
 --- !u!136 &8198083827635885447
 CapsuleCollider:
   m_ObjectHideFlags: 0

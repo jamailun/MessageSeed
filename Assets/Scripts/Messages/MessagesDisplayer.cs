@@ -10,17 +10,24 @@ public class MessagesDisplayer : MonoBehaviour {
 	[SerializeField] private MessageRenderer rendererPrefab;
 
 	private Vector3 _scale = Vector3.zero;
+	private float lastUpdate;
+	private Coordinates lastCoordinates;
 
 	public void PositionInit(Coordinates coordinates) {
-		Debug.LogWarning("POSITION INIT " + coordinates);
 		messagesManager.UpdatePosition(coordinates);
 		messagesManager.UpdateMessages(coordinates);
+		lastUpdate = Time.time;
+		lastCoordinates = coordinates;
 	}
 
 	public void PositionChanged(Coordinates coordinates) {
 		messagesManager.UpdatePosition(coordinates);
-		//TODO IF DISTANCE LRAGE? UPDATE
-		//messagesManager.UpdateMessages(coordinates);
+		// update after 120s || moved of 200m
+		if(Time.time - lastUpdate >= 120 || coordinates.DistanceFromPoint(lastCoordinates) >= 200) {
+			messagesManager.UpdateMessages(coordinates);
+			lastUpdate = Time.time;
+			lastCoordinates = coordinates;
+		}
 	}
 	
 	public void MessagesAdded(List<Message> messages) {
