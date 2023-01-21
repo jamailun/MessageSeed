@@ -15,21 +15,21 @@ public class MessageRenderer : MonoBehaviour {
 
 	private bool IsLoaded => Message != null && Message.IsComplete;
 	public Message Message { get; private set; }
-	private Vector3 _position;
 
-	private void Start() {
+	public void SetMessage(Message message) {
+		Message = message;
+		UpdateChild();
+	}
+
+	public void RandomizePosition() {
 		// set random rotation
 		transform.rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
+		// and random position delta
 		transform.localPosition += new Vector3(
 			Random.Range(-randomAmplitude, randomAmplitude),
 			bonusHeight,
 			Random.Range(-randomAmplitude, randomAmplitude)
 		);
-	}
-
-	public void SetMessage(Message message) {
-		Message = message;
-		UpdateChild();
 	}
 
 	private void UpdateChild() {
@@ -45,7 +45,6 @@ public class MessageRenderer : MonoBehaviour {
 			return;
 		}
 		var child = Instantiate(prefab, transform);
-		//child.transform.localPosition = _position;
 		child.transform.localScale = (1f + Message.LikesAmount * likeScaleBonus) * Vector3.one;
 	}
 

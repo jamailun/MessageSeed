@@ -44,6 +44,7 @@ public class MessagesDisplayer : MonoBehaviour {
 			renderer.gameObject.name = "MessageRenderer["+msg.MessageId+"]";
 			renderer.transform.localPosition = msg.Coordinates.convertCoordinateToVector(0);
 			renderer.transform.localScale = _scale;
+			renderer.RandomizePosition();
 
 			renderers.Add(msg.MessageId, renderer);
 		}
