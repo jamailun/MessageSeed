@@ -5,7 +5,7 @@ using TMPro;
 public class MessageLineUI : MonoBehaviour {
 
 	private Message _message;
-	private ProfileDisplayUI profileDisplay;
+	private CSharpExtension.Consumable<Message> _clickAction;
 
 	[SerializeField] private Image icon;
 	[SerializeField] private TMP_Text title;
@@ -16,31 +16,28 @@ public class MessageLineUI : MonoBehaviour {
 	[SerializeField] private Sprite iconSapling;
 	[SerializeField] private Sprite iconTree;
 
-	private void Start() {
-		profileDisplay = GetComponentInParent<ProfileDisplayUI>();
-	}
-
-	public void SetData(MessageListSerializer msg) {
+	public void SetData(Message message, CSharpExtension.Consumable<Message> clickAction) {
 		// data
-		_message = new Message(msg);
+		_message = message;
+		_clickAction = clickAction;
 		// display
-		title.text = msg.title;
-		water.text = msg.like_count + "";
-		icon.sprite = GetIcon(msg.state);
+		title.text = message.MessageTitle;
+		water.text = message.LikesAmount + "";
+		icon.sprite = GetIcon(message.State);
 	}
 
-	private Sprite GetIcon(int state) {
+	private Sprite GetIcon(MessageState state) {
 		return (state) switch {
-			0 => iconSeed,
-			1 => iconSapling,
-			2 => iconTree,
+			MessageState.Seed => iconSeed,
+			MessageState.Sapling => iconSapling,
+			MessageState.Tree => iconTree,
 			_ => iconDead
 		};
 	}
 
 	public void LineClicked() {
 		Debug.Log("OK CLICKED + " + _message);
-		profileDisplay.messageOpenEvent?.Invoke(_message);
+		_clickAction?.Invoke(_message);
 	}
 
 }

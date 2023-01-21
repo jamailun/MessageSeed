@@ -57,7 +57,7 @@ public class ProfileDisplayUI : MainMenuWindowUI {
 		list.Sort((a, b) => a.like_count - b.like_count);
 		foreach(var msg in msgs) {
 			var line = Instantiate(linePrefab, linesContainer);
-			line.SetData(msg);
+			line.SetData(new(msg), m => messageOpenEvent?.Invoke(m));
 		}
 	}
 

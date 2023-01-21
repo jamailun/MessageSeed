@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 public class MessageRaycast : MonoBehaviour {
 
@@ -21,12 +22,31 @@ public class MessageRaycast : MonoBehaviour {
 
 			Debug.DrawRay(ray.origin, ray.direction.normalized * 1500f, Color.red, 3f);
 
-			if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
-				if(hit.collider.GetComponentInParent<MessageRenderer>() != null) {
-					MessageRenderer renderer = hit.collider.GetComponentInParent<MessageRenderer>();
+			// Raycast
+			RaycastHit[] rays = Physics.RaycastAll(ray, 10000, layerMask);
+
+			string s = "[";
+			foreach(var r in rays)
+				s += r.collider.name + ", ";
+			Debug.LogWarning("RAYCAST SIZE : " + rays.Length+" => " + s + "]");
+			
+			// Found nothing : we early return
+			if(rays.Length == 0)
+				return;
+
+			// Found 1 hit : we just display it
+			if(rays.Length == 1) {
+				MessageRenderer renderer = rays[0].collider.GetComponentInParent<MessageRenderer>();
+				if(renderer)
 					renderer.OpenOrLoad(MessageReadyToOpen);
-				}
+				return;
 			}
+
+			// Found multiple elements, we display them in a nice UI
+			List<MessageRenderer> renderers = new List<RaycastHit>(rays)
+					.FindAll(hit => hit.collider.GetComponentInParent<MessageRenderer>() != null)
+					.ConvertAll(hit => hit.collider.GetComponentInParent<MessageRenderer>());
+			MessagesListWindow.Instance.OpenWithMessages(renderers, MessageReadyToOpen);
 		}
 	}
 
@@ -34,6 +54,8 @@ public class MessageRaycast : MonoBehaviour {
 		Debug.Log("MESSAGE READY TO OPEN : " + message);
 		messageOpenedEvent?.Invoke(message);
 	}
+
+
 
 	[System.Serializable]
 	public class MessageOpenedEvent : UnityEvent<Message> { }
