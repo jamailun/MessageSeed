@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MainMenuUI : MonoBehaviour {
 
-	private State state = State.DEFAULT;
+	private MainMenuWindowUI currentWindow;
 	private MainMenuWindowUI subPanelOpen;
 	private MainMenuWindowUI subSubPanelOpen;
 
@@ -13,7 +13,7 @@ public class MainMenuUI : MonoBehaviour {
 	[SerializeField] private DisconnectedUI disconnectedUI;
 
 	public bool IsSomethingOpen() {
-		return state != State.DEFAULT || logoutUI.isActiveAndEnabled || disconnectedUI.isActiveAndEnabled;
+		return currentWindow != null || logoutUI.isActiveAndEnabled || disconnectedUI.isActiveAndEnabled;
 	}
 
 	private void Start() {
@@ -22,9 +22,23 @@ public class MainMenuUI : MonoBehaviour {
 	}
 
 	// Called by events
-	public void TriggerOpen(MainMenuWindowUI target) {
-		State newState = (target == null) ? State.DEFAULT : target.TargetState;
-		TriggerHandleOpen(newState, target);
+	public void TriggerOpen(MainMenuWindowUI newWindow) {
+		if(currentWindow == newWindow) {
+			// close
+			currentWindow.Close();
+			currentWindow = null;
+		} else if(currentWindow == null) {
+			// open
+			newWindow.Open();
+			currentWindow = newWindow;
+		}
+	}
+
+	public void TryOpen(MainMenuWindowUI target) {
+		if(currentWindow == null) {
+			target.Open();
+			currentWindow = target;
+		}
 	}
 
 	// c'est IMMONDE mais j'ai pas le temps de faire mieux désolé
@@ -62,7 +76,7 @@ public class MainMenuUI : MonoBehaviour {
 	public void CloseEverything() {
 		foreach(var w in windows)
 			w.Close();
-		state = State.DEFAULT;
+		currentWindow = null;
 		subPanelOpen = null;
 		subSubPanelOpen = null;
 	}
@@ -74,32 +88,6 @@ public class MainMenuUI : MonoBehaviour {
 		} else if(subPanelOpen) {
 			subPanelOpen.Close();
 			subPanelOpen = null;
-		}
-	}
-
-	[System.Serializable]
-	public enum State {
-		DEFAULT = 0,
-		// message
-		SHOW_SETTINGS = 10,
-		SHOW_PROFILE,
-		SHOW_PLAYER_CUSTOMIZATION,
-		SHOW_PLAYER_SETTINGS,
-		SHOW_CREDITS,
-		// message
-		SHOW_MESSAGE_NEW = 20,
-		SHOW_READ_MESSAGE,
-	}
-
-	private void TriggerHandleOpen(State newState, MainMenuWindowUI window) {
-		if(state == newState) {
-			// close
-			window.Close();
-			state = State.DEFAULT;
-		} else if(state == State.DEFAULT) {
-			// open
-			window.Open();
-			state = newState;
 		}
 	}
 
