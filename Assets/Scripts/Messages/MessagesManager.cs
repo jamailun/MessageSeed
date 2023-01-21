@@ -46,11 +46,12 @@ public class MessagesManager : MonoBehaviour {
 				}
 			} else {
 				string json = www.downloadHandler.text;
-				Debug.Log("Success gettin messages list : " + json);
 
 				// Unity CANNOT handle [{}...]. It needs to be wrapped as {list:[{}...]}
 				string jsonWrapped = CSharpExtension.WrapJsonToClass(json, "list");
 				var headers = JsonUtility.FromJson<MessagesHeaderList>(jsonWrapped);
+
+				Debug.Log("Successfully fetched " + headers.list.Length + " messages.");
 
 				foreach(var header in headers.list) {
 					messages.Add(new Message(header));
@@ -104,11 +105,12 @@ public class MessagesManager : MonoBehaviour {
 	}
 
 	private IEnumerator CR_LikeMessage(MessageDisplay owner) {
+		Debug.Log("Sending like.");
 		using(UnityWebRequest www = RemoteApiManager.Instance.CreateAuthPutRequest("/database/message/" + owner.Message.MessageId + "/like")) {
 			yield return www.SendWebRequest();
 
 			if(www.result != UnityWebRequest.Result.Success) {
-				Debug.LogError(www.error + " : " + www.downloadHandler?.text);
+				Debug.LogError("LIKE:"+www.error + " : " + www.downloadHandler?.text);
 				owner.EndOfLikeProcess();
 				if(www.responseCode == 401) {
 					// UNAUTHORIZED
