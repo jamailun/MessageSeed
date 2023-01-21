@@ -38,14 +38,12 @@ public class MessageDisplay : MonoBehaviour {
 		}
 	}
 
-	private bool _loading = false;
 	public void PressedLike() {
-		if(_message == null || _message.WasMessageLiked || _loading)
+		if(_message == null || _message.WasMessageLiked)
 			return;
 		Debug.Log("start liking.");
-		_loading = true;
 		backButton.interactable = false;
-		likeButton.interactable = false;
+		likeButton.gameObject.SetActive(false);
 		likedEvent?.Invoke(this);
 	}
 
@@ -71,20 +69,20 @@ public class MessageDisplay : MonoBehaviour {
 
 		// Likes
 		likesField.text = DisplayLikes(Message.LikesAmount);
-		likeButton.interactable = (! Message.WasMessageLiked) && (Message.AuthorId != AccountManager.Account.accountId);
+		likeButton.gameObject.SetActive((! Message.WasMessageLiked) && (Message.AuthorId != AccountManager.Account.accountId));
 		likeImage.color = Message.WasMessageLiked ? colorLiked : colorNotLiked;
 	}
 
 	private string DisplayDate(TimeSpan span) {
 		if(span.TotalSeconds < 0)
 			return "invalid date.";
-		string s = "";
 		if(span.TotalDays >= 1)
-			s += span.Days + " day" + (span.Days > 1 ? "s" : "") + ", ";
+			return span.Days + " day" + (span.Days > 1 ? "s" : "");
 		if(span.TotalHours >= 1)
-			s += span.Hours + " hour" + (span.Hours > 1 ? "s" : "") + " and ";
-		s += span.Minutes + " minute" + (span.Minutes > 1 ? "s" : "") + ".";
-		return s;
+			return span.Hours + " hour" + (span.Hours > 1 ? "s" : "");
+		if(span.TotalMinutes >= 1)
+			return span.Minutes + " minute" + (span.Minutes > 1 ? "s" : "");
+		return span.Seconds + " second" + (span.Seconds > 1 ? "s" : "");
 	}
 
 	private string DisplayLikes(int amount) {

@@ -38,15 +38,16 @@ public class MessageRenderer : MonoBehaviour {
 			Debug.LogError("ERRROR tried to load messageRenderer " + name + "... But NO message has been provided.");
 			return;
 		}
+		// WE DO IT ANYWAY
+		StartCoroutine(CR_GetMessageDetails(callback));
 		if(IsLoaded) {
-			Debug.Log("message already loaded...");
 			callback?.Invoke(Message);
 			return;
 		}
-		StartCoroutine(CR_GetMessageDetails(callback));
 	}
 
 	private IEnumerator CR_GetMessageDetails(CSharpExtension.Consumable<Message> callback) {
+		bool wasLoaded = IsLoaded;
 		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/message/" + Message.MessageId+"/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
@@ -54,9 +55,11 @@ public class MessageRenderer : MonoBehaviour {
 			} else {
 				var messageComplete = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
 				Message.Complete(messageComplete);
-				Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete+"\n"+www.downloadHandler.text);
+				if(!wasLoaded) {
+					Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete + "\n" + www.downloadHandler.text);
+					UpdateChild();
+				}
 				callback?.Invoke(Message);
-				UpdateChild();
 			}
 		}
 	}

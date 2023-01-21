@@ -9,6 +9,7 @@ namespace JamUtils2D.JamConsole {
         [Header("Display config")]
         [SerializeField] private string timeFormat = "HH:mm:ss";
         [SerializeField] private JamConsoleColorSettings colorSettings = new();
+        [SerializeField] private int maxLines = 50;
 
         [Header("Scene config")]
         // output
@@ -77,6 +78,10 @@ namespace JamUtils2D.JamConsole {
             // Add the line
             var line = Instantiate(linePrefab, container.transform);
             line.SetText(lineContent, color, visible);
+
+            // remove the max amount
+            if(container.transform.childCount > maxLines)
+                Destroy(container.transform.GetChild(0).gameObject);
 
             // put scrollbar value to the old one (after recalculation).
             StartCoroutine(ApplyScrollPosition(scrollbar, scrollbarPosition));
