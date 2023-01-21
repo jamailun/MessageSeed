@@ -19,7 +19,7 @@ namespace JamUtils2D.JamConsole {
         // input
         [SerializeField] private SubmitWithButton inputField;
         // all
-        [SerializeField] private Button visibilityButton;
+        [SerializeField] private RectTransform consoleView;
 
         [Header("Persistence config")]
         [SerializeField] private bool dontDestroyOnLoad = true;
@@ -61,8 +61,16 @@ namespace JamUtils2D.JamConsole {
         }
 
         private void InputReceived(string input) {
-            Debug.Log("INPUT = (" + input + ")");
-            inputField.InputField.ActivateInputField();
+            //inputField.InputField.ActivateInputField();
+            if(input == "logs") {
+                visible = true;
+                ApplyVisibility();
+            } else if(input == "hide") {
+                visible = false;
+                ApplyVisibility();
+            } else if(input == "clear") {
+                container.transform.DestroyChildren();
+            }
         }
 
         public void MessageReceived(string logString, string _stackTrace, LogType type) {
@@ -105,16 +113,10 @@ namespace JamUtils2D.JamConsole {
         }
 
         private void ApplyVisibility() {
-            foreach(var img in transform.GetComponentsInChildren<Image>())
+            foreach(var img in consoleView.GetComponentsInChildren<Image>())
                 img.enabled = visible;
-            foreach(var txt in transform.GetComponentsInChildren<TMP_Text>())
+            foreach(var txt in consoleView.GetComponentsInChildren<TMP_Text>())
                 txt.enabled = visible;
-
-            visibilityButton.GetComponentInChildren<TMP_Text>().text = visible ? "Hide" : "Show";
-            visibilityButton.GetComponent<Image>().enabled = true;
-            visibilityButton.GetComponentInChildren<TMP_Text>().enabled = true;
-
-            inputField.gameObject.SetActive(visible);
         }
 
     }
