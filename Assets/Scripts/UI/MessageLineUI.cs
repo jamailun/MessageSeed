@@ -26,7 +26,7 @@ public class MessageLineUI : MonoBehaviour {
 		// display
 		title.text = msg.title;
 		water.text = msg.like_count + "";
-		icon.sprite = GetIcon(msg.like_count);
+		icon.sprite = GetIcon(msg.state);
 	}
 
 	private Sprite GetIcon(int state) {
@@ -39,7 +39,7 @@ public class MessageLineUI : MonoBehaviour {
 	}
 
 	public void LineClicked() {
-		Debug.Log("OK CLICKED");
+		Debug.Log("OK CLICKED + " + _message);
 		profileDisplay.messageOpenEvent?.Invoke(_message);
 	}
 

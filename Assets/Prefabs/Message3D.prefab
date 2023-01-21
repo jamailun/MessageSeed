@@ -48,6 +48,9 @@ MonoBehaviour:
   prefab_seed: {fileID: 5868843765078513787, guid: 062f75906dcd61949a848abbdf3c29a3, type: 3}
   prefab_bush: {fileID: 5868843765078513787, guid: ee8dc639256e9e24aa831ca209bb071c, type: 3}
   prefab_tree: {fileID: 8776418244539869002, guid: 5fc546c13eaed804fa1a355dc09fdb58, type: 3}
+  randomAmplitude: 2.5
+  bonusHeight: 1.28
+  likeScaleBonus: 0.02
 --- !u!136 &8198083827635885447
 CapsuleCollider:
   m_ObjectHideFlags: 0

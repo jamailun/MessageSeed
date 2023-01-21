@@ -8,9 +8,24 @@ public class MessageRenderer : MonoBehaviour {
 	[SerializeField] private GameObject prefab_seed;
 	[SerializeField] private GameObject prefab_bush;
 	[SerializeField] private GameObject prefab_tree;
+	[Header("Values")]
+	[SerializeField] private float randomAmplitude = 0.5f;
+	[SerializeField] private float bonusHeight = 0.5f;
+	[SerializeField] private float likeScaleBonus = 0.01f;
 
 	private bool IsLoaded => Message != null && Message.IsComplete;
 	public Message Message { get; private set; }
+	private Vector3 _position;
+
+	private void Start() {
+		// set random rotation
+		transform.rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
+		transform.localPosition += new Vector3(
+			Random.Range(-randomAmplitude, randomAmplitude),
+			bonusHeight,
+			Random.Range(-randomAmplitude, randomAmplitude)
+		);
+	}
 
 	public void SetMessage(Message message) {
 		Message = message;
@@ -30,7 +45,8 @@ public class MessageRenderer : MonoBehaviour {
 			return;
 		}
 		var child = Instantiate(prefab, transform);
-		child.transform.localPosition = Vector3.zero;
+		//child.transform.localPosition = _position;
+		child.transform.localScale = (1f + Message.LikesAmount * likeScaleBonus) * Vector3.one;
 	}
 
 	public void OpenOrLoad(CSharpExtension.Consumable<Message> callback) {
@@ -47,7 +63,6 @@ public class MessageRenderer : MonoBehaviour {
 	}
 
 	private IEnumerator CR_GetMessageDetails(CSharpExtension.Consumable<Message> callback) {
-		bool wasLoaded = IsLoaded;
 		using(var www = RemoteApiManager.Instance.CreateAuthGetRequest("/database/message/" + Message.MessageId+"/")) {
 			yield return www.SendWebRequest();
 			if(www.result != UnityWebRequest.Result.Success) {
@@ -55,10 +70,7 @@ public class MessageRenderer : MonoBehaviour {
 			} else {
 				var messageComplete = JsonUtility.FromJson<MessageComplete>(www.downloadHandler.text);
 				Message.Complete(messageComplete);
-				if(!wasLoaded) {
-					Debug.Log("Got message complete of " + Message.MessageId + " successfully:" + messageComplete + "\n" + www.downloadHandler.text);
-					UpdateChild();
-				}
+				UpdateChild();
 				callback?.Invoke(Message);
 			}
 		}
