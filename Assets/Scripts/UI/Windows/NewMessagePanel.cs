@@ -10,8 +10,6 @@ public class NewMessagePanel : MonoBehaviour {
 	[SerializeField] private Button saveButton;
 	[SerializeField] private UnityEvent afterSaveEvent;
 
-	[SerializeField] private AlertUI alertUI;
-
 	private void Start() {
 		saveButton.interactable = true;
 	}
@@ -27,7 +25,7 @@ public class NewMessagePanel : MonoBehaviour {
 		if(error != null) {
 			Debug.LogError("Validation error : " + error);
 			saveButton.interactable = true;
-			alertUI.Open(error);
+			AlertUI.OpenAlert(error);
 			return;
 		}
 
@@ -38,7 +36,7 @@ public class NewMessagePanel : MonoBehaviour {
 
 	private void MessageSendingError(string error) {
 		Debug.LogError("ERROR : could NOT send message. Error is \"" + error + "\".");
-		alertUI.Open(error);
+		AlertUI.OpenAlert(error);
 	}
 
 	private void MessageSendingOver() {

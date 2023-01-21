@@ -43,6 +43,8 @@ public class MessagesManager : MonoBehaviour {
 				if(www.responseCode == 401) {
 					// UNAUTHORIZED
 					unauthorizedEvent?.Invoke();
+				} else {
+					AlertUI.OpenAlert("Could get messages: " + www.downloadHandler?.text);
 				}
 			} else {
 				string json = www.downloadHandler.text;
@@ -115,6 +117,8 @@ public class MessagesManager : MonoBehaviour {
 				if(www.responseCode == 401) {
 					// UNAUTHORIZED
 					unauthorizedEvent?.Invoke();
+				} else {
+					AlertUI.OpenAlert("Could list this message: " + www.downloadHandler?.text);
 				}
 			} else {
 				Debug.Log("Liked message successfully !");
