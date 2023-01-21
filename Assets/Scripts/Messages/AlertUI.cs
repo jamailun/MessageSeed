@@ -10,6 +10,7 @@ public class AlertUI : MonoBehaviour {
 			return;
 		}
 		Instance = this;
+		gameObject.SetActive(false);
 	}
 
 	[SerializeField] private TMPro.TMP_Text title;
