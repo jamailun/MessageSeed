@@ -35,9 +35,13 @@ public class MainMenuUI : MonoBehaviour {
 	}
 
 	public void TryOpen(MainMenuWindowUI target) {
+		if(currentWindow != null && ! currentWindow.IsOpen)
+			currentWindow = null;
 		if(currentWindow == null) {
 			target.Open();
 			currentWindow = target;
+		} else {
+			Debug.LogWarning("could NOT open " + target + ". Currently open is " + currentWindow);
 		}
 	}
 

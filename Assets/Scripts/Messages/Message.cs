@@ -28,6 +28,8 @@ public class Message {
 
 	public Message(MessageHeader header) {
 		this.header = header;
+		MessageTitle = header.title;
+		LikesAmount = header.like_count;
 		IsComplete = false;
 	}
 
@@ -74,9 +76,11 @@ public enum MessageState : int {
 [System.Serializable]
 public struct MessageHeader {
 	public string id;
-	public string author;
+	public string author_name;
+	public string title;
 	public double latitude, longitude;
 	public int state;
+	public int like_count;
 
 	public MessageState State {
 		get {
@@ -88,16 +92,7 @@ public struct MessageHeader {
 	}
 	public Coordinates Coordinates => new(latitude, longitude);
 
-	public string AuthorId {
-		get {
-			if(author == null || !author.Contains("/"))
-				return author;
-			var t = author.Split("/");
-			if(t.Length < 2)
-				return author;
-			return t[^2];
-		}
-	}
+	public string AuthorId => author_name;
 
 	public override string ToString() {
 		return "MessageHeader{id=" + id + ", author_id=" + AuthorId + ", lat=" + latitude + ", long=" + longitude + "}";
@@ -129,7 +124,6 @@ public struct MessagesHeaderList {
 public struct MessageListSerializer {
 	// header
 	public string id;
-	public string author;
 	public double latitude, longitude;
 	public int state;
 	// now
@@ -144,10 +138,12 @@ public struct MessageListSerializer {
 	public MessageHeader ToHeader() {
 		return new MessageHeader() {
 			id = id,
-			author = author,
+			author_name = author_name,
 			latitude = latitude,
+			title = title,
 			longitude = longitude,
-			state = state
+			state = state,
+			like_count = like_count
 		};
 	}
 

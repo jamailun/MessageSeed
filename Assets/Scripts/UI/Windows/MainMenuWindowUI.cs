@@ -5,6 +5,7 @@ using UnityEngine.Events;
 public class MainMenuWindowUI : MonoBehaviour {
 
 	private bool open = false;
+	public bool IsOpen => open;
 
 	[SerializeField] private UnityEvent openEvent;
 	[SerializeField] private UnityEvent closeEvent;
