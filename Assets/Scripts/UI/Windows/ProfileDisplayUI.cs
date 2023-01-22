@@ -35,7 +35,7 @@ public class ProfileDisplayUI : MainMenuWindowUI {
 		expBar.fillAmount = Mathf.Clamp((float) ((profile.experience - profile.experience_previous) / (profile.experience_next - profile.experience_previous)), 0f, 1f);
 
 		likesReceivedField.text = profile.likes_received_total + "";
-		likesGivenField.text = profile.likes_received_total + "";
+		likesGivenField.text = profile.likes_given_total + "";
 	}
 
 	private void ProfileFailed(int errCode) {
