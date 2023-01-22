@@ -24,8 +24,10 @@ public class MessagesListWindow : MainMenuWindowUI {
 		foreach(var renderer in renderers) {
 			var line = Instantiate(linePrefab, content);
 			line.SetData(renderer.Message, m => {
+				Debug.Log("closing message list");
 				Close();
-				chosenEvent?.Invoke(m);
+				Debug.Log("calling up event with " + m);
+				renderer.OpenOrLoad(chosenEvent);
 			});
 		}
 	}
